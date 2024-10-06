@@ -1,16 +1,49 @@
-import { Controller } from '@hotwired/stimulus';
+import { Controller } from "@hotwired/stimulus";
+// import { useDispatch } from "stimulus-use";
 
-/*
- * This is an example Stimulus controller!
- *
- * Any element with a data-controller="hello" attribute will cause
- * this controller to be executed. The name "hello" comes from the filename:
- * hello_controller.js -> "hello"
- *
- * Delete this file or adapt it for your use!
- */
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
-    connect() {
-        this.element.textContent = 'Hello Stimulus! Edit me in assets/controllers/hello_controller.js';
+  static targets = ["fields", "field", "addButton"];
+
+  static values = {
+    prototype: String,
+    maxItems: Number,
+    itemsCount: Number,
+    autoload: Boolean,
+  };
+
+  connect() {
+    this.index = this.itemsCountValue = this.fieldTargets.length;
+    if (this.autoloadValue) {
+      this.addItem();
     }
+  }
+
+  addItem() {
+    const isFirst = this.itemsCountValue === 0;
+    let prototype = JSON.parse(this.prototypeValue);
+    const newField = prototype.replace(/__name__/g, this.index);
+    this.fieldsTarget.insertAdjacentHTML("beforeend", newField);
+
+    this.index++;
+    this.itemsCountValue++;
+  }
+
+  removeItem(event) {
+    this.fieldTargets.forEach((element, i) => {
+      if (element.contains(event.target)) {
+        element.remove();
+        this.itemsCountValue--;
+        this.index--;
+      }
+    });
+  }
+
+  itemsCountValueChanged() {
+    if (false === this.hasAddButtonTarget || 0 === this.maxItemsValue) {
+      return;
+    }
+    const maxItemsReached = this.itemsCountValue >= this.maxItemsValue;
+    this.addButtonTarget.classList.toggle("d-none", maxItemsReached);
+  }
 }

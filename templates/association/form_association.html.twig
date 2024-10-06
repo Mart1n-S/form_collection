@@ -1,0 +1,197 @@
+{% macro memberForm(member) %}
+	<div class="card mb-3" id="membre-__name__" data-index="__name__" data-target="field">
+		<div class="card-body">
+			<h5 class="card-title">Informations du membre</h5>
+			<div class="row g-3">
+				<div class="col-md-6">
+					{{ form_row(member.nom) }}
+				</div>
+				<div class="col-md-6">
+					{{ form_row(member.prenom) }}
+					{{ form_errors(member.prenom) }}
+				</div>
+				<div class="col-md-6">
+					{{ form_row(member.email) }}
+				</div>
+				<div class="col-md-6">
+					{{ form_row(member.situationMaritale) }}
+				</div>
+				<div class="col-md-12">
+					{{ form_row(member.statut) }}
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+{% endmacro %}
+{% macro docForm(doc) %}
+	<div class="cardDoc mb-3" id="doc-membre-__name__" data-index-doc="__name__" data-target="fieldDoc">
+		<div class="card-body">
+			<div class="row g-3">
+				<div class="col-md-6">
+					{{ form_row(doc.numeroSiret) }}
+				</div>
+				<div class="col-md-6">
+					{{ form_row(doc.chiffreAffaires) }}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endmacro %}
+
+{% import _self as formMacros %}
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<div class="container mt-5">
+		<h1>Création de l'Association</h1>
+		<!-- Progress bar -->
+		<div class="progress mb-4">
+			<div class="progress-bar" role="progressbar" style="width: 25%;" id="progress-bar">Étape 1/4</div>
+		</div>
+		{{ form_start(form) }}
+		<!-- Étape 1 -->
+		<div id="step-1" class="step">
+			<h2>Étape 1: Informations sur l'Association</h2>
+			<div class="mb-3">
+				{{ form_row(form.nom) }}
+			</div>
+
+			<button type="button" class="btn btn-primary next-step">
+				Suivant
+				<i class="fas fa-arrow-right"></i>
+			</button>
+		</div>
+
+		<!-- Étape 2 -->
+		<div id="step-2" class="step" style="display: none;">
+			<h2>Étape 2: Plus d'informations</h2>
+			<div class="mb-3">
+				{{ form_row(form.dateCreation) }}
+			</div>
+			<div class="mb-3">
+				{{ form_row(form.email) }}
+			</div>
+			<div class="mb-3">
+				{{ form_row(form.adresse) }}
+			</div>
+			<button type="button" class="btn btn-primary previous-step">
+				Precedent
+				<i class="fas fa-arrow-right"></i>
+			</button>
+
+			<button type="button" class="btn btn-primary next-step">
+				Suivant
+				<i class="fas fa-arrow-right"></i>
+			</button>
+		</div>
+
+		<!-- Étape 3 -->
+		<div id="step-3" class="step" style="display: none;">
+			<h2>Étape 3: Informations du Membre 1</h2>
+			<div id="initialMember" data-max-items="3" data-prototype="{{ formMacros.memberForm(form.membres.vars.prototype)|json_encode }}">
+				<div data-target="fields">
+					{% do form.membres.setRendered %}
+					{% for membre in form.membres %}
+						{{ formMacros.memberForm(membre) }}
+					{% endfor %}
+				</div>
+			</div>
+			<button type="button" class="btn btn-primary previous-step">
+				Precedent
+				<i class="fas fa-arrow-right"></i>
+			</button>
+
+			<button type="button" class="btn btn-primary next-step">
+				Suivant
+				<i class="fas fa-arrow-right"></i>
+			</button>
+
+
+		</div>
+
+		<!-- Étape 4: Prévisualisation des Informations du Membre 1 -->
+		<div id="step-4" class="step" style="display: none;">
+			<h2>Étape 4: Prévisualisation des Informations du Membre 1</h2>
+
+			<!-- Card pour afficher les informations du membre 1 -->
+			<div class="card mb-4" id="member-card-0" data-index="0">
+				<div class="card-body">
+					<h5 class="card-title">Membre 1</h5>
+					<p class="card-text" id="member-name"></p>
+					<button type="button" class="btn btn-primary edit-member" data-index="0">Éditer</button>
+				</div>
+			</div>
+
+			<div class="member-cards"></div>
+
+
+			<button type="button" class="btn btn-success" id="add-member">
+				<i class="fas fa-plus"></i>
+				Ajouter un Membre
+			</button>
+
+
+			<!-- Modal pour éditer les informations du membre 1 -->
+			<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="editMemberModalLabel">Ajouter / Modifier un Membre</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body" id="modal-member-form"></div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+							<button type="button" class="btn btn-primary" id="save-member">Enregistrer</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+
+			<button type="button" class="btn btn-primary previous-step">
+				Precedent
+				<i class="fas fa-arrow-right"></i>
+			</button>
+			<button type="button" class="btn btn-primary next-step">
+				Suivant
+				<i class="fas fa-arrow-right"></i>
+			</button>
+
+		</div>
+
+		<div id="step-5" class="step" style="display: none;">
+
+			<div id="initialMemberDoc" data-max-items-doc="3" data-prototype-doc="{{ formMacros.docForm(form.membres.vars.prototype.documents.vars.prototype)|json_encode }}">
+				<div data-target-doc="fieldsDoc">
+					{% do form.membres.setRendered %}
+					{% for membre in form.membres %}
+						{% do membre.documents.setRendered %}
+						{% for doc in membre.documents %}
+							{{ formMacros.docForm(doc) }}
+						{% endfor %}
+					{% endfor %}
+				</div>
+			</div>
+
+			<button type="button" class="btn btn-primary previous-step">
+				Precedent
+				<i class="fas fa-arrow-right"></i>
+			</button>
+
+			<button type="submit" class="btn btn-success">
+				<i class="fas fa-check"></i>
+				Soumettre
+			</button>
+
+		</div>
+
+
+		{{ form_end(form) }}
+
+	</div>
+
+{% endblock %}

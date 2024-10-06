@@ -32,6 +32,9 @@ class Membre
     #[ORM\JoinColumn(nullable: false)]
     private ?Association $association = null;
 
+    // Défini un tableau pour stocker les documents sans les persister
+    private array $documents = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -105,6 +108,19 @@ class Membre
     public function setAssociation(?Association $association): static
     {
         $this->association = $association;
+
+        return $this;
+    }
+
+    // Méthodes pour gérer les documents
+    public function getDocuments(): array
+    {
+        return $this->documents;
+    }
+
+    public function setDocuments(array $documents): static
+    {
+        $this->documents = $documents;
 
         return $this;
     }
