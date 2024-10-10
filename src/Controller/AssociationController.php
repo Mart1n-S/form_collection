@@ -30,42 +30,86 @@ class AssociationController extends AbstractController
 
             $data = $form->getData();
 
-            foreach ($data->getMembres() as $membre) {
-                // Accéder aux documents de chaque membre
-                $documentsOfMembre = $membre->getDocuments(); // Récupérer les documents
+            // Créer un dossier unique pour cette soumission (par exemple basé sur un identifiant unique)
+            $uniqueFolder = md5(uniqid());
+            $uploadDirectory = $this->getParameter('uploads_directory') . '/' . $uniqueFolder;
 
-                // Logique pour traiter les documents, par exemple, les ajouter à un tableau pour un email
-                foreach ($documentsOfMembre as $document) {
-                    $numeroSiret = $document['numeroSiret'];
-                    $chiffreAffaires = $document['chiffreAffaires'];
-
-                    $email = (new Email())
-                        ->from('votre_email@example.com')
-                        ->to('destinataire@example.com')
-                        ->subject('Nouveaux membres et documents')
-                        ->html($this->renderView('emails/membre_notification.html.twig', [
-                            'numeroSiret' => $numeroSiret,
-                            'chiffreAffaires' => $chiffreAffaires,
-                        ]));
-
-                    // Envoyer l'e-mail
-                    $mailer->send($email);
-                }
+            // Créer le répertoire si ce n'est pas déjà fait
+            if (!file_exists($uploadDirectory)) {
+                mkdir($uploadDirectory, 0777, true);
             }
 
-            // Persister l'association et les membres
-            foreach ($association->getMembres() as $membre) {
+            // Tableau pour stocker les chemins des fichiers
+            $files = [];
 
+            foreach ($data->getMembres() as $membre) {
+                // Accéder aux documents de chaque membre
+                $cni = $membre->getCni();
+                $justificatifDomicile = $membre->getJustificatifDomicile();
+
+                if ($cni) {
+                    // Générer un nom de fichier unique pour chaque document
+                    $cniFileName = md5(uniqid()) . '.' . $cni->guessExtension();
+                    // Sauvegarder le document CNI dans le répertoire unique
+                    $cni->move($uploadDirectory, $cniFileName);
+                    // Ajouter le chemin au tableau de fichiers
+                    $files[] = $uploadDirectory . '/' . $cniFileName;
+                }
+
+                if ($justificatifDomicile) {
+                    // Générer un nom de fichier unique pour chaque document
+                    $justificatifDomicileFileName = md5(uniqid()) . '.' . $justificatifDomicile->guessExtension();
+                    // Sauvegarder le justificatif de domicile dans le répertoire unique
+                    $justificatifDomicile->move($uploadDirectory, $justificatifDomicileFileName);
+                    // Ajouter le chemin au tableau de fichiers
+                    $files[] = $uploadDirectory . '/' . $justificatifDomicileFileName;
+                }
+
+                // Associer le membre à l'association
                 $membre->setAssociation($association);
                 $entityManager->persist($membre);
             }
 
+            // Création d'une archive ZIP contenant tous les fichiers
+            $zip = new \ZipArchive();
+            $zipFileName = $uploadDirectory . '/documents.zip';
+
+            if ($zip->open($zipFileName, \ZipArchive::CREATE) === TRUE) {
+                // Sans compression
+                // foreach ($files as $file) {
+                //     // Ajouter chaque fichier au ZIP
+                //     $zip->addFile($file, basename($file));
+                // }
+
+                // Avec compression
+                foreach ($files as $file) {
+                    // Ajouter chaque fichier au ZIP
+                    $zip->addFile($file, basename($file));
+                    // Ajuster le niveau de compression pour chaque fichier (9 = compression maximale)
+                    $zip->setCompressionIndex($zip->numFiles - 1, \ZipArchive::CM_DEFLATE);
+                }
+                // Fermer le fichier ZIP
+                $zip->close();
+
+                // Suppression des fichiers après avoir créé le ZIP
+                foreach ($files as $file) {
+                    if (file_exists($file)) {
+                        unlink($file); // Supprime le fichier
+                    }
+                }
+            } else {
+                throw new \Exception('Impossible de créer le fichier ZIP');
+            }
+
+            // Persister l'association et les membres
             $entityManager->persist($association);
             $entityManager->flush();
 
             // Redirection après succès
             return $this->redirectToRoute('association_success');
         }
+
+
 
         return $this->render('association/form_association.html.twig', [
             'form' => $form->createView(),

@@ -30,10 +30,10 @@
 		<div class="card-body">
 			<div class="row g-3">
 				<div class="col-md-6">
-					{{ form_row(doc.numeroSiret) }}
+					{{ form_row(doc.cni) }}
 				</div>
 				<div class="col-md-6">
-					{{ form_row(doc.chiffreAffaires) }}
+					{{ form_row(doc.justificatifDomicile) }}
 				</div>
 			</div>
 		</div>
@@ -91,7 +91,7 @@
 		<!-- Étape 3 -->
 		<div id="step-3" class="step" style="display: none;">
 			<h2>Étape 3: Informations du Membre 1</h2>
-			<div id="initialMember" data-max-items="3" data-prototype="{{ formMacros.memberForm(form.membres.vars.prototype)|json_encode }}">
+			<div id="initialMember" {% if form.membres.vars.value is not empty %} data-autoload-value="false" {% else %} data-autoload-value="true" {% endif %} data-max-items="3" data-prototype="{{ formMacros.memberForm(form.membres.vars.prototype)|json_encode }}">
 				<div data-target="fields">
 					{% do form.membres.setRendered %}
 					{% for membre in form.membres %}
@@ -128,14 +128,17 @@
 			<div class="member-cards"></div>
 
 
-			<button type="button" class="btn btn-success" id="add-member">
+			<button type="button" class="btn btn-success" id="add-member" data-bs-toggle="modal" data-bs-target="#editMemberModal">
+
+
 				<i class="fas fa-plus"></i>
 				Ajouter un Membre
 			</button>
 
 
 			<!-- Modal pour éditer les informations du membre 1 -->
-			<div class="modal fade" id="editMemberModal" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
+			<div class="modal fade" id="editMemberModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" tabindex="-1" aria-labelledby="editMemberModalLabel" aria-hidden="true">
+
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -165,14 +168,12 @@
 
 		<div id="step-5" class="step" style="display: none;">
 
-			<div id="initialMemberDoc" data-max-items-doc="3" data-prototype-doc="{{ formMacros.docForm(form.membres.vars.prototype.documents.vars.prototype)|json_encode }}">
+			<div id="initialMemberDoc" data-max-items-doc="3" data-prototype-doc="{{ formMacros.docForm(form.membres.vars.prototype)|json_encode }}">
 				<div data-target-doc="fieldsDoc">
 					{% do form.membres.setRendered %}
 					{% for membre in form.membres %}
-						{% do membre.documents.setRendered %}
-						{% for doc in membre.documents %}
-							{{ formMacros.docForm(doc) }}
-						{% endfor %}
+						{{ formMacros.docForm(membre) }}
+
 					{% endfor %}
 				</div>
 			</div>

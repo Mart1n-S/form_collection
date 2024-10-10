@@ -56,7 +56,7 @@ $(document).ready(function () {
 
   let index = fieldTarget.length;
   let itemsCountValue = index;
-
+  console.log(index);
   // Recuperation des elements pour les documents
   const fieldsTargetDoc = $('div[data-target-doc="fieldsDoc"]');
   const prototypeValueDoc = $("#initialMemberDoc").attr("data-prototype-doc");
@@ -92,7 +92,8 @@ $(document).ready(function () {
       });
     } else {
       $("#modal-member-form").append(prototype);
-      $("#editMemberModal").modal("show");
+      // <------On supprime ça c'est ce qui cause le probleme de la modal on gere l'affichage avec les propriete bootstrap----->
+      // $("#editMemberModal").modal("show");
 
       // Lier le bouton de sauvegarde
       $("#save-member")
@@ -108,7 +109,54 @@ $(document).ready(function () {
     itemsCountValue++;
     checkItemsCount();
   }
-  addItemV2();
+
+  // <---------Rajout de code pour gérer lorsqu'il y a une erreur on remet tout a sa place et on attache les bons elements---------->
+  if ($("#initialMember").attr("data-autoload-value") == "true") {
+    addItemV2();
+  } else {
+    // Chercher tous les elements ayant data-taret="field"
+    let nb = 0;
+    $('div[data-target="field"]').each(function () {
+      // Remplacer l'attribut 'id'
+      const newId = $(this)
+        .attr("id")
+        .replace("membre-__name__", "membre-" + nb);
+      $(this).attr("id", newId);
+
+      // Remplacer l'attribut 'data-index'
+      const newIndex = $(this).attr("data-index").replace("__name__", nb);
+      $(this).attr("data-index", newIndex);
+
+      $(`.edit-member[data-index="${nb}"]`).on("click", function () {
+        $("#membre-0").removeClass("d-none");
+        $("#editMemberModal").modal("show");
+
+        //Modifier l'evenement de sauvergarde en edit
+        $("#save-member")
+          .off("click")
+          .on("click", function () {
+            editMember($("#membre-0").attr("data-index"));
+          });
+
+        // Lier les boutons de fermeture de la modal pour juste fermer la modal sans supprimer les informations du membre
+        $('button[data-bs-dismiss="modal"]').each(function () {
+          $(this)
+            .off("click")
+            .on("click", function (e) {
+              $("#editMemberModal").modal("hide");
+              $("#membre-0").addClass("d-none");
+            });
+        });
+      });
+
+      if (nb > 0) {
+        $("#modal-member-form").append($(this).addClass("d-none"));
+        saveMember(nb);
+      }
+      // <---Il reste a change le __name__ par le bon index pour les documents---->
+      nb++;
+    });
+  }
 
   // Ajouter un nouveau membre
   $("#add-member").on("click", function () {

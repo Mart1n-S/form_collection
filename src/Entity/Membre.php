@@ -32,8 +32,9 @@ class Membre
     #[ORM\JoinColumn(nullable: false)]
     private ?Association $association = null;
 
-    // Défini un tableau pour stocker les documents sans les persister
-    private array $documents = [];
+    private $cni;
+
+    private $justificatifDomicile;
 
     public function getId(): ?int
     {
@@ -113,14 +114,27 @@ class Membre
     }
 
     // Méthodes pour gérer les documents
-    public function getDocuments(): array
+    public function getCni()
     {
-        return $this->documents;
+        return $this->cni;
     }
 
-    public function setDocuments(array $documents): static
+    public function setCni($cni): static
     {
-        $this->documents = $documents;
+        $this->cni = $cni;
+
+        return $this;
+    }
+
+
+    public function getJustificatifDomicile()
+    {
+        return $this->justificatifDomicile;
+    }
+
+    public function setJustificatifDomicile($justificatifDomicile): static
+    {
+        $this->justificatifDomicile = $justificatifDomicile;
 
         return $this;
     }
