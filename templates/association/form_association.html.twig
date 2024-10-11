@@ -31,9 +31,13 @@
 			<div class="row g-3">
 				<div class="col-md-6">
 					{{ form_row(doc.cni) }}
+					<div id="error-file-cni-__name__" class="error-message" style="display: none; color: red;"></div> <!-- Conteneur d'erreur -->
+
 				</div>
 				<div class="col-md-6">
 					{{ form_row(doc.justificatifDomicile) }}
+					      <div id="error-file-justificatifDomicile-__name__" class="error-message" style="display: none; color: red;"></div> <!-- Conteneur d'erreur -->
+
 				</div>
 			</div>
 		</div>
@@ -51,7 +55,10 @@
 		<div class="progress mb-4">
 			<div class="progress-bar" role="progressbar" style="width: 25%;" id="progress-bar">Étape 1/4</div>
 		</div>
-		{{ form_start(form) }}
+		{# Rajouter novalidate et needs-validation, il faut jouer avec le was-validated , invalid pour afficher le invalid-feedback #}
+		{{ form_start(form, {
+                    attr: { 'novalidate': '', 'class':'needs-validation' }
+                }) }}
 		<!-- Étape 1 -->
 		<div id="step-1" class="step">
 			<h2>Étape 1: Informations sur l'Association</h2>
@@ -68,14 +75,36 @@
 		<!-- Étape 2 -->
 		<div id="step-2" class="step" style="display: none;">
 			<h2>Étape 2: Plus d'informations</h2>
+			 <div>
+				{% if form.dateCreation.vars.errors|length > 0 %}
+					<div id="error-dateCreation" class="invalid-feedback">
+						{{ form_errors(form.dateCreation) }}
+					</div>
+				{% endif %}
+				
+				{% if form.email.vars.errors|length > 0 %}
+					<div id="error-email" class="error-message">
+						{{ form_errors(form.email) }}
+					</div>
+				{% endif %}
+				
+				{% if form.adresse.vars.errors|length > 0 %}
+					<div id="error-adresse" class="invalid-feedback">
+						{{ form_errors(form.adresse) }}
+					</div>
+				{% endif %}
+			</div>
 			<div class="mb-3">
 				{{ form_row(form.dateCreation) }}
 			</div>
 			<div class="mb-3">
 				{{ form_row(form.email) }}
 			</div>
-			<div class="mb-3">
-				{{ form_row(form.adresse) }}
+			<div class="mb-3 has-validation">
+				{{ form_widget(form.adresse) }}
+				<div class="invalid-feedback">
+        {{ form_errors(form.adresse) }}
+      </div>
 			</div>
 			<button type="button" class="btn btn-primary previous-step">
 				Precedent

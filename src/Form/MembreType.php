@@ -34,7 +34,7 @@ class MembreType extends AbstractType
                 'required' => false,
                 'constraints' => [
                     new Assert\File([
-                        'maxSize' => '1K',
+                        'maxSize' => '1M',
                         'mimeTypes' => [
                             'application/pdf',
                             'image/jpeg',

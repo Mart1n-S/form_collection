@@ -282,7 +282,58 @@ $(document).ready(function () {
       indexDoc
     );
 
+    // Ajouter les nouveaux inputs dans le formulaire
     fieldsTargetDoc.append(prototypeDoc);
+
+    // Récupérer les nouveaux inputs file ajoutés
+    const cniInput = document.querySelector(
+      `#association_membres_${indexDoc}_cni`
+    );
+    const justificatifDomicileInput = document.querySelector(
+      `#association_membres_${indexDoc}_justificatifDomicile`
+    );
+
+    // Récupérer les conteneurs d'erreurs
+    const errorCniContainer = document.querySelector(
+      `#error-file-cni-${indexDoc}`
+    );
+    const errorJustificatifContainer = document.querySelector(
+      `#error-file-justificatifDomicile-${indexDoc}`
+    );
+
+    // Taille maximale du fichier autorisée (2 Mo par exemple)
+    const maxSize = 2 * 1024 * 1024;
+
+    // Fonction pour afficher ou masquer le message d'erreur
+    function handleFileValidation(fileInput, errorContainer, errorMessage) {
+      const file = fileInput.files[0];
+      if (file && file.size > maxSize) {
+        errorContainer.textContent = errorMessage;
+        errorContainer.style.display = "block";
+        fileInput.value = "";
+      } else {
+        errorContainer.textContent = "";
+        errorContainer.style.display = "none";
+      }
+    }
+
+    // Vérifier la taille du fichier CNI
+    cniInput.addEventListener("change", function () {
+      handleFileValidation(
+        cniInput,
+        errorCniContainer,
+        "Le fichier CNI est trop volumineux."
+      );
+    });
+
+    // Vérifier la taille du fichier justificatif de domicile
+    justificatifDomicileInput.addEventListener("change", function () {
+      handleFileValidation(
+        justificatifDomicileInput,
+        errorJustificatifContainer,
+        "Le justificatif de domicile est trop volumineux."
+      );
+    });
   }
 
   function removeItemDoc(value) {
