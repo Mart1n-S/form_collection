@@ -4,13 +4,18 @@ namespace App\Form;
 
 use App\Entity\Association;
 use Symfony\Component\Form\AbstractType;
+use PhpParser\Node\Scalar\MagicConst\Dir;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Date;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotNull;
 
 class AssociationType extends AbstractType
 {
@@ -18,9 +23,18 @@ class AssociationType extends AbstractType
     {
         $builder
             ->add('nom', TextType::class)
-            ->add('dateCreation', null, [
+            ->add('dateCreation', DateType::class, [
                 'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'html5' => true,
+                'required' => true,
+                'constraints' => [
+                    new \Symfony\Component\Validator\Constraints\NotBlank([
+                        'message' => 'La date de création est obligatoire.',
+                    ]),
+                ],
             ])
+
             ->add('email', EmailType::class)
             ->add('adresse', TextType::class, [
                 "attr" => [

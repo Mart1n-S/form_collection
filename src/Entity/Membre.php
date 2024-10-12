@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\MembreRepository;
+use App\Entity\Statut;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\MembreRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: MembreRepository::class)]
 class Membre
@@ -25,9 +28,6 @@ class Membre
     #[ORM\Column(length: 255)]
     private ?string $situationMaritale = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $statut = null;
-
     #[ORM\ManyToOne(inversedBy: 'membres')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Association $association = null;
@@ -35,6 +35,9 @@ class Membre
     private $cni;
 
     private $justificatifDomicile;
+
+    #[ORM\ManyToOne]
+    private ?Statut $statut = null;
 
     public function getId(): ?int
     {
@@ -89,12 +92,12 @@ class Membre
         return $this;
     }
 
-    public function getStatut(): ?string
+    public function getStatut(): ?Statut
     {
         return $this->statut;
     }
 
-    public function setStatut(string $statut): static
+    public function setStatut(Statut $statut): static
     {
         $this->statut = $statut;
 

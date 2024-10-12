@@ -3,9 +3,11 @@
 namespace App\Form;
 
 use App\Entity\Membre;
+use App\Entity\Statut;
 use Symfony\Component\Form\AbstractType;
 use PHPUnit\TextUI\XmlConfiguration\File;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -28,7 +30,12 @@ class MembreType extends AbstractType
             ])
             ->add('email', EmailType::class)
             ->add('situationMaritale', TextType::class)
-            ->add('statut', TextType::class)
+            ->add('statut', EntityType::class, [
+                'class' => Statut::class,
+                'choice_label' => 'nom', // Affiche le nom du statut dans le select
+                'placeholder' => 'Sélectionnez un statut',
+                'required' => true,
+            ])
             ->add('cni', FileType::class, [
                 'mapped' => true,
                 'required' => false,

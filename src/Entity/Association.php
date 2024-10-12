@@ -8,8 +8,12 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\AssociationRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as CustomAssert;
+
 
 #[ORM\Entity(repositoryClass: AssociationRepository::class)]
+#[CustomAssert\ValidMembres]
 class Association
 {
     #[ORM\Id]
@@ -20,8 +24,8 @@ class Association
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $dateCreation = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
+    private ?\DateTimeImmutable $dateCreation;
 
     #[ORM\Column(length: 255)]
     private ?string $email = null;
@@ -33,8 +37,8 @@ class Association
      * @var Collection<int, Membre>
      */
     #[ORM\OneToMany(targetEntity: Membre::class, mappedBy: 'association', cascade: ['persist', 'remove'])]
+    #[Assert\Valid] // Valider chaque membre dans la collection
     private Collection $membres;
-
     public function __construct()
     {
         $this->membres = new ArrayCollection();
@@ -57,12 +61,12 @@ class Association
         return $this;
     }
 
-    public function getDateCreation(): ?\DateTimeInterface
+    public function getDateCreation(): ?\DateTimeImmutable
     {
         return $this->dateCreation;
     }
 
-    public function setDateCreation(\DateTimeInterface $dateCreation): static
+    public function setDateCreation(?\DateTimeImmutable $dateCreation): static
     {
         $this->dateCreation = $dateCreation;
 

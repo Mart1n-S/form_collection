@@ -18,6 +18,7 @@
 				</div>
 				<div class="col-md-12">
 					{{ form_row(member.statut) }}
+
 				</div>
 			</div>
 		</div>
@@ -31,12 +32,14 @@
 			<div class="row g-3">
 				<div class="col-md-6">
 					{{ form_row(doc.cni) }}
-					<div id="error-file-cni-__name__" class="error-message" style="display: none; color: red;"></div> <!-- Conteneur d'erreur -->
+					<div id="error-file-cni-__name__" class="error-message" style="display: none; color: red;"></div>
+					<!-- Conteneur d'erreur -->
 
 				</div>
 				<div class="col-md-6">
 					{{ form_row(doc.justificatifDomicile) }}
-					      <div id="error-file-justificatifDomicile-__name__" class="error-message" style="display: none; color: red;"></div> <!-- Conteneur d'erreur -->
+					<div id="error-file-justificatifDomicile-__name__" class="error-message" style="display: none; color: red;"></div>
+					<!-- Conteneur d'erreur -->
 
 				</div>
 			</div>
@@ -75,19 +78,19 @@
 		<!-- Étape 2 -->
 		<div id="step-2" class="step" style="display: none;">
 			<h2>Étape 2: Plus d'informations</h2>
-			 <div>
+			<div>
 				{% if form.dateCreation.vars.errors|length > 0 %}
 					<div id="error-dateCreation" class="invalid-feedback">
 						{{ form_errors(form.dateCreation) }}
 					</div>
 				{% endif %}
-				
+
 				{% if form.email.vars.errors|length > 0 %}
 					<div id="error-email" class="error-message">
 						{{ form_errors(form.email) }}
 					</div>
 				{% endif %}
-				
+
 				{% if form.adresse.vars.errors|length > 0 %}
 					<div id="error-adresse" class="invalid-feedback">
 						{{ form_errors(form.adresse) }}
@@ -103,8 +106,8 @@
 			<div class="mb-3 has-validation">
 				{{ form_widget(form.adresse) }}
 				<div class="invalid-feedback">
-        {{ form_errors(form.adresse) }}
-      </div>
+					{{ form_errors(form.adresse) }}
+				</div>
 			</div>
 			<button type="button" class="btn btn-primary previous-step">
 				Precedent
@@ -120,6 +123,8 @@
 		<!-- Étape 3 -->
 		<div id="step-3" class="step" style="display: none;">
 			<h2>Étape 3: Informations du Membre 1</h2>
+			{{ form_errors(form) }}
+
 			<div id="initialMember" {% if form.membres.vars.value is not empty %} data-autoload-value="false" {% else %} data-autoload-value="true" {% endif %} data-max-items="3" data-prototype="{{ formMacros.memberForm(form.membres.vars.prototype)|json_encode }}">
 				<div data-target="fields">
 					{% do form.membres.setRendered %}

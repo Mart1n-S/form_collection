@@ -25,7 +25,7 @@ class AssociationController extends AbstractController
 
         // Traitement de la requête
         $form->handleRequest($request);
-
+        // dd($form->getData());
         if ($form->isSubmitted() && $form->isValid()) {
 
             $data = $form->getData();
