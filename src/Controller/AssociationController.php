@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AssociationController extends AbstractController
@@ -105,6 +108,22 @@ class AssociationController extends AbstractController
             $entityManager->persist($association);
             $entityManager->flush();
 
+            // Générer un lien pour télécharger le fichier ZIP
+            $downloadLink = $this->generateUrl('association_download_zip', [
+                'folder' => $uniqueFolder
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+
+            // Envoyer l'email avec le lien de téléchargement
+            $email = (new Email())
+                ->from('noreply@yourdomain.com')
+                ->to($association->getEmail())
+                ->subject('Téléchargez les documents de votre association')
+                ->html('<p>Bonjour,</p><p>Merci d\'avoir soumis les informations de votre association. Vous pouvez télécharger les documents en utilisant le lien suivant : <a href="' . $downloadLink . '">Télécharger les documents</a>.</p>');
+
+            $mailer->send($email);
+
+
             // Redirection après succès
             return $this->redirectToRoute('association_success');
         }
@@ -120,5 +139,57 @@ class AssociationController extends AbstractController
     public function success(): Response
     {
         return $this->render('association/association_success.html.twig');
+    }
+
+    #[Route('/association/download/{folder}', name: 'association_download_zip')]
+    public function downloadZip(string $folder): StreamedResponse
+    {
+        $uploadDirectory = $this->getParameter('uploads_directory') . '/' . $folder;
+        $zipFile = $uploadDirectory . '/documents.zip';
+
+        // Vérifier si le fichier ZIP existe
+        if (!file_exists($zipFile)) {
+            throw $this->createNotFoundException('Le fichier ZIP n\'existe pas.');
+        }
+
+        // Créer une réponse streamée pour s'assurer que le fichier est bien envoyé avant toute suppression
+        $response = new StreamedResponse(function () use ($zipFile, $uploadDirectory) {
+            // Ouvrir le fichier et envoyer son contenu
+            readfile($zipFile);
+
+            // Supprimer le répertoire après l'envoi du fichier
+            $this->deleteDirectory($uploadDirectory);
+        });
+
+        // Paramètres de la réponse
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            'documents.zip'
+        ));
+
+        return $response;
+    }
+
+
+    // Méthode pour supprimer un répertoire et son contenu
+    private function deleteDirectory(string $dir): bool
+    {
+        if (!is_dir($dir)) {
+            return false;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+
+        foreach ($files as $file) {
+            $filePath = $dir . DIRECTORY_SEPARATOR . $file;
+            if (is_dir($filePath)) {
+                $this->deleteDirectory($filePath);
+            } else {
+                unlink($filePath); // Supprimer chaque fichier
+            }
+        }
+
+        return rmdir($dir); // Supprimer le répertoire après son contenu
     }
 }
