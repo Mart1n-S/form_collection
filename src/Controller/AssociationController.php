@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Association;
+use App\Entity\DowloadToken;
 use App\Form\AssociationType;
 use Symfony\Component\Mime\Email;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\AssociationRepository;
+use App\Repository\DowloadTokenRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +33,9 @@ class AssociationController extends AbstractController
         $form->handleRequest($request);
         // dd($form->getData());
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // Générer un token unique
+            $token = bin2hex(random_bytes(16)); // 32 caractères hexadécimaux
 
             $data = $form->getData();
 
@@ -108,11 +114,19 @@ class AssociationController extends AbstractController
             $entityManager->persist($association);
             $entityManager->flush();
 
-            // Générer un lien pour télécharger le fichier ZIP
-            $downloadLink = $this->generateUrl('association_download_zip', [
-                'folder' => $uniqueFolder
-            ], UrlGeneratorInterface::ABSOLUTE_URL);
+            // Enregistrer le token et le chemin dans la base de données
+            $downloadToken = new DowloadToken();
+            $downloadToken->setToken($token);
+            $downloadToken->setFolderPath($uniqueFolder);
 
+            $entityManager->persist($downloadToken);
+            $entityManager->flush();
+
+
+            // Générer un lien pour télécharger le fichier ZIP avec le token
+            $downloadLink = $this->generateUrl('association_download', [
+                'token' => $token
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
 
             // Envoyer l'email avec le lien de téléchargement
             $email = (new Email())
@@ -122,6 +136,22 @@ class AssociationController extends AbstractController
                 ->html('<p>Bonjour,</p><p>Merci d\'avoir soumis les informations de votre association. Vous pouvez télécharger les documents en utilisant le lien suivant : <a href="' . $downloadLink . '">Télécharger les documents</a>.</p>');
 
             $mailer->send($email);
+
+            // Lien de téléchargement direct
+            // // Générer un lien pour télécharger le fichier ZIP
+            // $downloadLink = $this->generateUrl('association_download_zip', [
+            //     'folder' => $uniqueFolder
+            // ], UrlGeneratorInterface::ABSOLUTE_URL);
+
+
+            // // Envoyer l'email avec le lien de téléchargement
+            // $email = (new Email())
+            //     ->from('noreply@yourdomain.com')
+            //     ->to($association->getEmail())
+            //     ->subject('Téléchargez les documents de votre association')
+            //     ->html('<p>Bonjour,</p><p>Merci d\'avoir soumis les informations de votre association. Vous pouvez télécharger les documents en utilisant le lien suivant : <a href="' . $downloadLink . '">Télécharger les documents</a>.</p>');
+
+            // $mailer->send($email);
 
 
             // Redirection après succès
@@ -141,9 +171,65 @@ class AssociationController extends AbstractController
         return $this->render('association/association_success.html.twig');
     }
 
-    #[Route('/association/download/{folder}', name: 'association_download_zip')]
-    public function downloadZip(string $folder): StreamedResponse
+
+
+
+    // Méthode pour supprimer un répertoire et son contenu
+    private function deleteDirectory(string $dir): bool
     {
+        if (!is_dir($dir)) {
+            return false;
+        }
+
+        $files = array_diff(scandir($dir), ['.', '..']);
+
+        foreach ($files as $file) {
+            $filePath = $dir . DIRECTORY_SEPARATOR . $file;
+            if (is_dir($filePath)) {
+                $this->deleteDirectory($filePath);
+            } else {
+                unlink($filePath); // Supprimer chaque fichier
+            }
+        }
+
+        return rmdir($dir); // Supprimer le répertoire après son contenu
+    }
+
+
+    #[Route('/association/download/{token}', name: 'association_download')]
+    public function downloadByToken(string $token, DowloadTokenRepository $dowloadTokenRepository): Response
+    {
+        // Rechercher le DownloadToken en fonction du token
+        $downloadToken = $dowloadTokenRepository->findOneBy(['token' => $token]);
+
+        if (!$downloadToken) {
+            throw $this->createNotFoundException('Token invalide.');
+        }
+
+        // Récupérer le chemin du dossier
+        $folderPath = $downloadToken->getFolderPath();
+        $zipFile = $this->getParameter('uploads_directory') . '/' . $folderPath . '/documents.zip';
+
+        // Vérifier si le fichier ZIP existe
+        if (!file_exists($zipFile)) {
+            throw $this->createNotFoundException('Le fichier ZIP n\'existe pas.');
+        }
+
+        return $this->render('association/download.html.twig', [
+            'downloadLink' => $this->generateUrl('association_download_zip', ['folder' => $folderPath]),
+            'token' => $token, // Passer le token si nécessaire pour une future utilisation
+        ]);
+    }
+
+    #[Route('/association/zip/download/{folder}', name: 'association_download_zip')]
+    public function downloadZip(string $folder, DowloadTokenRepository $dowloadTokenRepository): StreamedResponse
+    {
+        // Rechercher le DownloadToken en fonction du dossier
+        $downloadToken = $dowloadTokenRepository->findOneBy(['folderPath' => $folder]);
+        if (!$downloadToken) {
+            throw $this->createNotFoundException('Token invalide.');
+        }
+
         $uploadDirectory = $this->getParameter('uploads_directory') . '/' . $folder;
         $zipFile = $uploadDirectory . '/documents.zip';
 
@@ -168,28 +254,11 @@ class AssociationController extends AbstractController
             'documents.zip'
         ));
 
+        // Supprimer le token après le téléchargement
+        $dowloadTokenRepository->remove($downloadToken, true);
+
+
+
         return $response;
-    }
-
-
-    // Méthode pour supprimer un répertoire et son contenu
-    private function deleteDirectory(string $dir): bool
-    {
-        if (!is_dir($dir)) {
-            return false;
-        }
-
-        $files = array_diff(scandir($dir), ['.', '..']);
-
-        foreach ($files as $file) {
-            $filePath = $dir . DIRECTORY_SEPARATOR . $file;
-            if (is_dir($filePath)) {
-                $this->deleteDirectory($filePath);
-            } else {
-                unlink($filePath); // Supprimer chaque fichier
-            }
-        }
-
-        return rmdir($dir); // Supprimer le répertoire après son contenu
     }
 }
