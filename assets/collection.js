@@ -286,39 +286,33 @@ $(document).ready(function () {
     fieldsTargetDoc.append(prototypeDoc);
 
     // Récupérer les nouveaux inputs file ajoutés
-    const cniInput = document.querySelector(
-      `#association_membres_${indexDoc}_cni`
-    );
-    const justificatifDomicileInput = document.querySelector(
+    const cniInput = $(`#association_membres_${indexDoc}_cni`);
+    const justificatifDomicileInput = $(
       `#association_membres_${indexDoc}_justificatifDomicile`
     );
 
     // Récupérer les conteneurs d'erreurs
-    const errorCniContainer = document.querySelector(
-      `#error-file-cni-${indexDoc}`
-    );
-    const errorJustificatifContainer = document.querySelector(
+    const errorCniContainer = $(`#error-file-cni-${indexDoc}`);
+    const errorJustificatifContainer = $(
       `#error-file-justificatifDomicile-${indexDoc}`
     );
 
-    // Taille maximale du fichier autorisée (2 Mo par exemple)
-    const maxSize = 2 * 1024 * 1024;
+    // Taille maximale du fichier autorisée (1 Mo par exemple)
+    const maxSize = 1024;
 
     // Fonction pour afficher ou masquer le message d'erreur
     function handleFileValidation(fileInput, errorContainer, errorMessage) {
-      const file = fileInput.files[0];
+      const file = fileInput[0].files[0]; // Utiliser fileInput[0] pour obtenir l'élément natif
       if (file && file.size > maxSize) {
-        errorContainer.textContent = errorMessage;
-        errorContainer.style.display = "block";
-        fileInput.value = "";
+        errorContainer.text(errorMessage).show();
+        fileInput.val(""); // Réinitialiser l'input file
       } else {
-        errorContainer.textContent = "";
-        errorContainer.style.display = "none";
+        errorContainer.text("").hide();
       }
     }
 
     // Vérifier la taille du fichier CNI
-    cniInput.addEventListener("change", function () {
+    cniInput.on("change", function () {
       handleFileValidation(
         cniInput,
         errorCniContainer,
@@ -327,7 +321,7 @@ $(document).ready(function () {
     });
 
     // Vérifier la taille du fichier justificatif de domicile
-    justificatifDomicileInput.addEventListener("change", function () {
+    justificatifDomicileInput.on("change", function () {
       handleFileValidation(
         justificatifDomicileInput,
         errorJustificatifContainer,
@@ -341,6 +335,30 @@ $(document).ready(function () {
       .find(".cardDoc[data-index-doc=" + value + "]")
       .remove();
   }
+});
+
+const maxSize = 2 * 1024 * 1024; // Taille maximale du fichier autorisée (2 Mo)
+
+// Fonction pour afficher ou masquer le message d'erreur
+function handleFileValidation(fileInput, errorContainer, errorMessage) {
+  const file = fileInput[0].files[0];
+  if (file && file.size > maxSize) {
+    errorContainer.text(errorMessage).show();
+    fileInput.val(""); // Réinitialiser l'input file
+  } else {
+    errorContainer.text("").hide();
+  }
+}
+
+// Attacher un écouteur d'événement 'change' à chaque input file
+$("#container-input-file").on("change", 'input[type="file"]', function () {
+  const index = $('#container-input-file input[type="file"]').index(this); // Obtenir l'index de l'input
+  const errorContainer = $(`#error-file-${index}`); // Sélectionner le conteneur d'erreur correspondant
+  handleFileValidation(
+    $(this),
+    errorContainer,
+    "Le fichier est trop volumineux."
+  );
 });
 //   <---- Fin logique gestion collection ajout des documents ---->
 
