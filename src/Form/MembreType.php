@@ -8,6 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use PHPUnit\TextUI\XmlConfiguration\File;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -35,6 +36,8 @@ class MembreType extends AbstractType
                 'choice_label' => 'nom', // Affiche le nom du statut dans le select
                 'placeholder' => 'Sélectionnez un statut',
                 'required' => true,
+                // Gérer message d'erreur pour un champ de type EntityType
+                'invalid_message' => 'Le statut sélectionné n\'est pas valide.',
             ])
             ->add('cni', FileType::class, [
                 'mapped' => true,
