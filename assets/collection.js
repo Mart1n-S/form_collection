@@ -338,15 +338,31 @@ $(document).ready(function () {
 });
 
 const maxSize = 2 * 1024 * 1024; // Taille maximale du fichier autorisée (2 Mo)
+const allowedTypes = ["application/pdf", "image/jpeg", "image/png"]; // Types de fichiers autorisés
 
 // Fonction pour afficher ou masquer le message d'erreur
-function handleFileValidation(fileInput, errorContainer, errorMessage) {
+function handleFileValidation(
+  fileInput,
+  errorContainer,
+  errorMessageSize,
+  errorMessageType
+) {
   const file = fileInput[0].files[0];
-  if (file && file.size > maxSize) {
-    errorContainer.text(errorMessage).show();
-    fileInput.val(""); // Réinitialiser l'input file
-  } else {
-    errorContainer.text("").hide();
+
+  if (file) {
+    // Vérification de la taille
+    if (file.size > maxSize) {
+      errorContainer.text(errorMessageSize).show();
+      fileInput.val(""); // Réinitialiser l'input file
+    }
+    // Vérification du type
+    else if (!allowedTypes.includes(file.type)) {
+      errorContainer.text(errorMessageType).show();
+      fileInput.val(""); // Réinitialiser l'input file
+    } else {
+      // Si tout est correct, cacher les erreurs
+      errorContainer.text("").hide();
+    }
   }
 }
 
@@ -354,12 +370,16 @@ function handleFileValidation(fileInput, errorContainer, errorMessage) {
 $("#container-input-file").on("change", 'input[type="file"]', function () {
   const index = $('#container-input-file input[type="file"]').index(this); // Obtenir l'index de l'input
   const errorContainer = $(`#error-file-${index}`); // Sélectionner le conteneur d'erreur correspondant
+
+  // Appeler la fonction de validation
   handleFileValidation(
     $(this),
     errorContainer,
-    "Le fichier est trop volumineux."
+    "Le fichier est trop volumineux.", // Message d'erreur pour la taille
+    "Le format du fichier n'est pas autorisé." // Message d'erreur pour le type
   );
 });
+
 //   <---- Fin logique gestion collection ajout des documents ---->
 
 // Reste à gérer les messages d'erreur
