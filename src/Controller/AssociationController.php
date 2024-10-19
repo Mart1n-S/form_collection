@@ -47,68 +47,105 @@ class AssociationController extends AbstractController
             if (!file_exists($uploadDirectory)) {
                 mkdir($uploadDirectory, 0777, true);
             }
-
-            // Tableau pour stocker les chemins des fichiers
-            $files = [];
-
-            foreach ($data->getMembres() as $membre) {
-                // Accéder aux documents de chaque membre
-                $cni = $membre->getCni();
-                $justificatifDomicile = $membre->getJustificatifDomicile();
-
-                if ($cni) {
-                    // Générer un nom de fichier unique pour chaque document
-                    $cniFileName = md5(uniqid()) . '.' . $cni->guessExtension();
-                    // Sauvegarder le document CNI dans le répertoire unique
-                    $cni->move($uploadDirectory, $cniFileName);
-                    // Ajouter le chemin au tableau de fichiers
-                    $files[] = $uploadDirectory . '/' . $cniFileName;
-                }
-
-                if ($justificatifDomicile) {
-                    // Générer un nom de fichier unique pour chaque document
-                    $justificatifDomicileFileName = md5(uniqid()) . '.' . $justificatifDomicile->guessExtension();
-                    // Sauvegarder le justificatif de domicile dans le répertoire unique
-                    $justificatifDomicile->move($uploadDirectory, $justificatifDomicileFileName);
-                    // Ajouter le chemin au tableau de fichiers
-                    $files[] = $uploadDirectory . '/' . $justificatifDomicileFileName;
-                }
-
-                // Associer le membre à l'association
-                $membre->setAssociation($association);
-                $entityManager->persist($membre);
-            }
-
-            // Création d'une archive ZIP contenant tous les fichiers
+            // <--------Simplification du code on zip directement et on enregistre le zip plutot que de l'enregistrer puis zipperpouis supprime les fichier non zipper-------->
+            // Création d'une archive ZIP directement
             $zip = new \ZipArchive();
             $zipFileName = $uploadDirectory . '/documents.zip';
 
             if ($zip->open($zipFileName, \ZipArchive::CREATE) === TRUE) {
-                // Sans compression
-                // foreach ($files as $file) {
-                //     // Ajouter chaque fichier au ZIP
-                //     $zip->addFile($file, basename($file));
-                // }
 
-                // Avec compression
-                foreach ($files as $file) {
-                    // Ajouter chaque fichier au ZIP
-                    $zip->addFile($file, basename($file));
-                    // Ajuster le niveau de compression pour chaque fichier (9 = compression maximale)
-                    $zip->setCompressionIndex($zip->numFiles - 1, \ZipArchive::CM_DEFLATE);
+                foreach ($data->getMembres() as $membre) {
+                    // Accéder aux documents de chaque membre
+                    $cni = $membre->getCni();
+                    $justificatifDomicile = $membre->getJustificatifDomicile();
+
+                    if ($cni) {
+                        // Générer un nom de fichier unique et l'ajouter directement au ZIP
+                        $cniFileName = md5(uniqid()) . '.' . $cni->guessExtension();
+                        $zip->addFromString($cniFileName, file_get_contents($cni->getPathname()));
+                        $zip->setCompressionIndex($zip->numFiles - 1, \ZipArchive::CM_DEFLATE); // Compression maximale
+                    }
+
+                    if ($justificatifDomicile) {
+                        // Générer un nom de fichier unique et l'ajouter directement au ZIP
+                        $justificatifDomicileFileName = md5(uniqid()) . '.' . $justificatifDomicile->guessExtension();
+                        $zip->addFromString($justificatifDomicileFileName, file_get_contents($justificatifDomicile->getPathname()));
+                        $zip->setCompressionIndex($zip->numFiles - 1, \ZipArchive::CM_DEFLATE); // Compression maximale
+                    }
+
+                    // Associer le membre à l'association
+                    $membre->setAssociation($association);
+                    $entityManager->persist($membre);
                 }
+
                 // Fermer le fichier ZIP
                 $zip->close();
-
-                // Suppression des fichiers après avoir créé le ZIP
-                foreach ($files as $file) {
-                    if (file_exists($file)) {
-                        unlink($file); // Supprime le fichier
-                    }
-                }
             } else {
                 throw new \Exception('Impossible de créer le fichier ZIP');
             }
+
+
+            // // Tableau pour stocker les chemins des fichiers
+            // $files = [];
+
+            // foreach ($data->getMembres() as $membre) {
+            //     // Accéder aux documents de chaque membre
+            //     $cni = $membre->getCni();
+            //     $justificatifDomicile = $membre->getJustificatifDomicile();
+
+            //     if ($cni) {
+            //         // Générer un nom de fichier unique pour chaque document
+            //         $cniFileName = md5(uniqid()) . '.' . $cni->guessExtension();
+            //         // Sauvegarder le document CNI dans le répertoire unique
+            //         $cni->move($uploadDirectory, $cniFileName);
+            //         // Ajouter le chemin au tableau de fichiers
+            //         $files[] = $uploadDirectory . '/' . $cniFileName;
+            //     }
+
+            //     if ($justificatifDomicile) {
+            //         // Générer un nom de fichier unique pour chaque document
+            //         $justificatifDomicileFileName = md5(uniqid()) . '.' . $justificatifDomicile->guessExtension();
+            //         // Sauvegarder le justificatif de domicile dans le répertoire unique
+            //         $justificatifDomicile->move($uploadDirectory, $justificatifDomicileFileName);
+            //         // Ajouter le chemin au tableau de fichiers
+            //         $files[] = $uploadDirectory . '/' . $justificatifDomicileFileName;
+            //     }
+
+            //     // Associer le membre à l'association
+            //     $membre->setAssociation($association);
+            //     $entityManager->persist($membre);
+            // }
+
+            // // Création d'une archive ZIP contenant tous les fichiers
+            // $zip = new \ZipArchive();
+            // $zipFileName = $uploadDirectory . '/documents.zip';
+
+            // if ($zip->open($zipFileName, \ZipArchive::CREATE) === TRUE) {
+            //     // Sans compression
+            //     // foreach ($files as $file) {
+            //     //     // Ajouter chaque fichier au ZIP
+            //     //     $zip->addFile($file, basename($file));
+            //     // }
+
+            //     // Avec compression
+            //     foreach ($files as $file) {
+            //         // Ajouter chaque fichier au ZIP
+            //         $zip->addFile($file, basename($file));
+            //         // Ajuster le niveau de compression pour chaque fichier (9 = compression maximale)
+            //         $zip->setCompressionIndex($zip->numFiles - 1, \ZipArchive::CM_DEFLATE);
+            //     }
+            //     // Fermer le fichier ZIP
+            //     $zip->close();
+
+            //     // Suppression des fichiers après avoir créé le ZIP
+            //     foreach ($files as $file) {
+            //         if (file_exists($file)) {
+            //             unlink($file); // Supprime le fichier
+            //         }
+            //     }
+            // } else {
+            //     throw new \Exception('Impossible de créer le fichier ZIP');
+            // }
 
             // Persister l'association et les membres
             $entityManager->persist($association);
