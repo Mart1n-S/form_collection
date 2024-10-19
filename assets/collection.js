@@ -298,18 +298,18 @@ $(document).ready(function () {
     );
 
     // Taille maximale du fichier autorisée (1 Mo par exemple)
-    const maxSize = 1024;
+    // const maxSize = 1024;
 
-    // Fonction pour afficher ou masquer le message d'erreur
-    function handleFileValidation(fileInput, errorContainer, errorMessage) {
-      const file = fileInput[0].files[0]; // Utiliser fileInput[0] pour obtenir l'élément natif
-      if (file && file.size > maxSize) {
-        errorContainer.text(errorMessage).show();
-        fileInput.val(""); // Réinitialiser l'input file
-      } else {
-        errorContainer.text("").hide();
-      }
-    }
+    // // Fonction pour afficher ou masquer le message d'erreur
+    // function handleFileValidation(fileInput, errorContainer, errorMessage) {
+    //   const file = fileInput[0].files[0]; // Utiliser fileInput[0] pour obtenir l'élément natif
+    //   if (file && file.size > maxSize) {
+    //     errorContainer.text(errorMessage).show();
+    //     fileInput.val(""); // Réinitialiser l'input file
+    //   } else {
+    //     errorContainer.text("").hide();
+    //   }
+    // }
 
     // Vérifier la taille du fichier CNI
     cniInput.on("change", function () {

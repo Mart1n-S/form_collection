@@ -2,9 +2,11 @@
 
 namespace App\Form;
 
+use App\Form\MembreType;
 use App\Entity\Association;
 use Symfony\Component\Form\AbstractType;
 use PhpParser\Node\Scalar\MagicConst\Dir;
+use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\Type;
@@ -15,6 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class AssociationType extends AbstractType
@@ -61,8 +64,10 @@ class AssociationType extends AbstractType
                 'mapped' => true,
                 'by_reference' => false,
             ])
-
-        ;
+            ->add('captcha', Recaptcha3Type::class, [
+                'constraints' => new Recaptcha3(),
+                'action_name' => 'captcha',
+            ]);;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
