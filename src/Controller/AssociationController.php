@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -81,7 +82,27 @@ class AssociationController extends AbstractController
                 // Fermer le fichier ZIP
                 $zip->close();
             } else {
-                throw new \Exception('Impossible de créer le fichier ZIP');
+                foreach ($data->getMembres() as $membre) {
+                    // Récupérer les fichiers CNI et justificatif de domicile du membre
+                    $cni = $membre->getCni();
+                    $justificatifDomicile = $membre->getJustificatifDomicile();
+
+                    // Copier le fichier CNI dans le dossier de téléchargement principal, s'il existe
+                    if ($cni) {
+                        $cniFileName = md5(uniqid()) . '.' . $cni->guessExtension();
+                        $cni->move($uploadDirectory, $cniFileName);
+                    }
+
+                    // Copier le fichier justificatif de domicile dans le dossier de téléchargement principal, s'il existe
+                    if ($justificatifDomicile) {
+                        $justificatifDomicileFileName = md5(uniqid()) . '.' . $justificatifDomicile->guessExtension();
+                        $justificatifDomicile->move($uploadDirectory, $justificatifDomicileFileName);
+                    }
+
+                    // Associer le membre à l'association
+                    $membre->setAssociation($association);
+                    $entityManager->persist($membre);
+                }
             }
 
 
@@ -233,6 +254,31 @@ class AssociationController extends AbstractController
     }
 
 
+    // #[Route('/association/download/{token}', name: 'association_download')]
+    // public function downloadByToken(string $token, DowloadTokenRepository $dowloadTokenRepository): Response
+    // {
+    //     // Rechercher le DownloadToken en fonction du token
+    //     $downloadToken = $dowloadTokenRepository->findOneBy(['token' => $token]);
+
+    //     if (!$downloadToken) {
+    //         throw $this->createNotFoundException('Token invalide.');
+    //     }
+
+    //     // Récupérer le chemin du dossier
+    //     $folderPath = $downloadToken->getFolderPath();
+    //     $zipFile = $this->getParameter('uploads_directory') . '/' . $folderPath . '/documents.zip';
+
+    //     // Vérifier si le fichier ZIP existe
+    //     if (!file_exists($zipFile)) {
+    //         throw $this->createNotFoundException('Le fichier ZIP n\'existe pas.');
+    //     }
+
+    //     return $this->render('association/download.html.twig', [
+    //         'downloadLink' => $this->generateUrl('association_download_zip', ['folder' => $folderPath]),
+    //         'token' => $token, // Passer le token si nécessaire pour une future utilisation
+    //     ]);
+    // }
+
     #[Route('/association/download/{token}', name: 'association_download')]
     public function downloadByToken(string $token, DowloadTokenRepository $dowloadTokenRepository): Response
     {
@@ -243,20 +289,41 @@ class AssociationController extends AbstractController
             throw $this->createNotFoundException('Token invalide.');
         }
 
-        // Récupérer le chemin du dossier
+        // Récupérer le chemin du dossier principal
         $folderPath = $downloadToken->getFolderPath();
         $zipFile = $this->getParameter('uploads_directory') . '/' . $folderPath . '/documents.zip';
 
+
         // Vérifier si le fichier ZIP existe
-        if (!file_exists($zipFile)) {
-            throw $this->createNotFoundException('Le fichier ZIP n\'existe pas.');
+        if (file_exists($zipFile)) {
+            return $this->render('association/download.html.twig', [
+                'downloadLink' => $this->generateUrl('association_download_zip', ['folder' => $downloadToken->getFolderPath()]),
+                'token' => $token,
+            ]);
+        }
+
+        // Si le fichier ZIP n'existe pas, récupérer les fichiers individuels
+        $files = [];
+        foreach (scandir($this->getParameter('uploads_directory') . '/' . $folderPath) as $file) {
+            if ($file !== '.' && $file !== '..') {
+                $files[] = [
+                    'name' => $file,
+                ];
+            }
+        }
+
+        // Si aucun fichier n'est trouvé
+        if (empty($files)) {
+            throw $this->createNotFoundException('Aucun fichier disponible pour téléchargement.');
         }
 
         return $this->render('association/download.html.twig', [
-            'downloadLink' => $this->generateUrl('association_download_zip', ['folder' => $folderPath]),
-            'token' => $token, // Passer le token si nécessaire pour une future utilisation
+            'files' => $files,
+            'folder' => $folderPath,
         ]);
     }
+
+
 
     #[Route('/association/zip/download/{folder}', name: 'association_download_zip')]
     public function downloadZip(string $folder, DowloadTokenRepository $dowloadTokenRepository): StreamedResponse
@@ -294,8 +361,63 @@ class AssociationController extends AbstractController
         // Supprimer le token après le téléchargement
         $dowloadTokenRepository->remove($downloadToken, true);
 
+        return $response;
+    }
 
+    #[Route('/association/file/download/{folder}/{filename}', name: 'association_download_file')]
+    public function downloadFile(string $folder, string $filename, DowloadTokenRepository $dowloadTokenRepository): StreamedResponse
+    {
+        // Rechercher le DownloadToken en fonction du dossier
+        $downloadToken = $dowloadTokenRepository->findOneBy(['folderPath' => $folder]);
+        if (!$downloadToken) {
+            throw $this->createNotFoundException('Token invalide.');
+        }
 
+        // Chemin vers le répertoire des téléchargements
+        $uploadDirectory = $this->getParameter('uploads_directory') . '/' . $folder;
+        $filePath = $uploadDirectory . '/' . $filename;
+
+        // Vérifier que le fichier existe
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Fichier non trouvé.');
+        }
+
+        // Créer une réponse StreamedResponse pour envoyer le fichier en streaming
+        $response = new StreamedResponse(function () use ($filePath) {
+            // Ouvrir le fichier et envoyer son contenu
+            $file = fopen($filePath, 'rb');
+            while (!feof($file)) {
+                echo fread($file, 1024); // Lire 1 Ko à la fois
+                flush(); // S'assurer que les données sont envoyées au client
+            }
+            fclose($file); // Fermer le fichier après envoi
+        });
+
+        // Définir les en-têtes pour le téléchargement du fichier
+        $response->headers->set('Content-Type', 'application/octet-stream');
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $filename
+        ));
+
+        // Enregistrer la fonction de suppression du fichier et du répertoire après le téléchargement
+        register_shutdown_function(function () use ($filePath, $uploadDirectory, $dowloadTokenRepository, $downloadToken) {
+            // Supprimer le fichier après qu'il ait été téléchargé
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            // Vérifier si le répertoire est vide après la suppression du fichier
+            $remainingFiles = array_diff(scandir($uploadDirectory), ['.', '..']);
+            if (empty($remainingFiles)) {
+                // Si le répertoire est vide, supprimer le répertoire
+                rmdir($uploadDirectory);
+                // Supprimer le token après le téléchargement
+                $dowloadTokenRepository->remove($downloadToken, true);
+            }
+        });
+
+        // Retourner la réponse de streaming
         return $response;
     }
 }

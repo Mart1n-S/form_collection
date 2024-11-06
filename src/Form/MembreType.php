@@ -61,7 +61,7 @@ class MembreType extends AbstractType
                     new Assert\File([
                         'maxSize' => '12M',
                         'mimeTypes' => [
-                            'application/pdf',
+                            'application/jpg',
                             'image/jpeg',
                         ],
                         'mimeTypesMessage' => 'Veuillez télécharger un document PDF valide.',

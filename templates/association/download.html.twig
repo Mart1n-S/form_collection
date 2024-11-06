@@ -1,5 +1,57 @@
-{# templates/association/download.html.twig #}
+{% extends 'base.html.twig' %}
 
-<h1>Téléchargement de documents</h1>
-<p>Votre lien de téléchargement est prêt :</p>
-<a href="{{ downloadLink }}">Télécharger le ZIP</a>
+{% block title %}Téléchargement des fichiers
+{% endblock %}
+
+{% block body %}
+	<h1>Téléchargement des fichiers</h1>
+
+	{% if downloadLink is defined %}
+		<p>
+			<a href="{{ downloadLink }}">Cliquez ici pour télécharger le fichier ZIP</a>
+		</p>
+	{% endif %}
+
+	{% if files is defined and files is not empty %}
+		<div id="file-section">
+			<h2>Fichiers disponibles :</h2>
+			<ul id="file-list">
+				{% for file in files %}
+					<li>
+						<a href="{{ path('association_download_file', {'folder': folder, 'filename': file.name}) }}" class="file-link">
+							{{ file.name }}
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		<p>Aucun fichier à télécharger.</p>
+	{% endif %}
+
+	<p id="closing-message" style="display: none;">Vous pouvez fermer la page.</p>
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+const fileLinks = document.querySelectorAll('.file-link');
+const fileSection = document.getElementById('file-section');
+const closingMessage = document.getElementById('closing-message');
+const fileList = document.getElementById('file-list');
+
+fileLinks.forEach(link => {
+link.addEventListener('click', function (event) {
+// Empêche l'action par défaut (suivi du lien)
+
+// Supprimer l'élément cliqué de la liste
+this.parentElement.remove();
+
+// Vérifier si la liste est vide
+if (fileList.children.length === 0) {
+fileSection.style.display = 'none'; // Masquer la section des fichiers
+closingMessage.style.display = 'block'; // Afficher le message de fermeture
+}
+});
+});
+});
+	</script>
+{% endblock %}
