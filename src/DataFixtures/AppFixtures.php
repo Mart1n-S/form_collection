@@ -2,9 +2,10 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Action;
 use App\Entity\Statut;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class AppFixtures extends Fixture
 {
@@ -19,6 +20,16 @@ class AppFixtures extends Fixture
 
             $manager->persist($newStatut);
         }
+
+        $nameAction = ['Sport en famille', 'Etudiant', 'Ecologie'];
+
+        foreach ($nameAction as $name) {
+            $newAction = new Action();
+            $newAction->setNameAction($name);
+
+            $manager->persist($newAction);
+        }
+
 
         $manager->flush();
     }

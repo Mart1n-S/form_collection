@@ -39,6 +39,10 @@ class Association
     #[ORM\OneToMany(targetEntity: Membre::class, mappedBy: 'association', cascade: ['persist', 'remove'])]
     #[Assert\Valid] // Valider chaque membre dans la collection
     private Collection $membres;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Action $action = null;
     public function __construct()
     {
         $this->membres = new ArrayCollection();
@@ -123,6 +127,18 @@ class Association
                 $membre->setAssociation(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getAction(): ?Action
+    {
+        return $this->action;
+    }
+
+    public function setAction(Action $action): static
+    {
+        $this->action = $action;
 
         return $this;
     }

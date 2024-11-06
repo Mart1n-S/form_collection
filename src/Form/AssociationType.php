@@ -2,12 +2,16 @@
 
 namespace App\Form;
 
+use App\Entity\Action;
 use App\Form\MembreType;
 use App\Entity\Association;
+use Doctrine\ORM\Mapping\Entity;
+use App\Repository\ActionRepository;
 use Symfony\Component\Form\AbstractType;
 use PhpParser\Node\Scalar\MagicConst\Dir;
 use Karser\Recaptcha3Bundle\Form\Recaptcha3Type;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\Date;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Constraints\Length;
@@ -22,6 +26,12 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class AssociationType extends AbstractType
 {
+    private $actionRepository;
+
+    public function __construct(ActionRepository $actionRepository)
+    {
+        $this->actionRepository = $actionRepository;
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -36,6 +46,26 @@ class AssociationType extends AbstractType
                         'message' => 'La date de création est obligatoire.',
                     ]),
                 ],
+            ])
+            // Option 1
+            // ->add('action', EntityType::class, [
+            //     'class' => Action::class,
+            //     'choice_label' => 'nameAction',
+            //     'multiple' => false, // Permet de ne sélectionner qu'une seule action
+            //     'expanded' => true, // Affiche les options sous forme de boutons radio
+            // ])
+            // Option2
+            ->add('action', EntityType::class, [
+                'class' => Action::class,
+                'choice_label' => fn(Action $action) => $action->getNameAction(),  // Utiliser la fonction pour récupérer un nom personnalisé
+                'multiple' => false,  // Permet de ne sélectionner qu'une seule action
+                'expanded' => true,   // Affiche sous forme de boutons radio
+                'choice_attr' => function ($action) {
+                    return [
+                        'class' => 'btn-check mandatory',  // Ajouter des classes ou d'autres attributs
+                        'data-id' => $action->getId()  // Exemple d'attribut personnalisé
+                    ];
+                },
             ])
 
             ->add('email', EmailType::class)

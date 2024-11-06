@@ -69,15 +69,28 @@
 				{{ form_row(form.nom) }}
 			</div>
 
+			<div class="mb-3">
+				{% for key, actionItem in form.action %}
+					<div class="card">
+						<label for="association_action_{{key}}">
+							<span>🐋</span>
+							{{actionItem.vars.label}}
+						</label>
+						{{ form_widget(actionItem) }}
+					</div>
+				{% endfor %}
+			</div>
+
+
 			{# Créer 3 input file #}
 			{# <div id="container-input-file">
-						<input type="file">
-						<div id="error-file-0" class="error-message text-danger" ></div>
-						<input type="file">
-						<div id="error-file-1" class="error-message text-danger" ></div>
-						<input type="file">
-						<div id="error-file-2" class="error-message text-danger" ></div>
-						</div> #}
+																																																								<input type="file">
+																																																								<div id="error-file-0" class="error-message text-danger" ></div>
+																																																								<input type="file">
+																																																								<div id="error-file-1" class="error-message text-danger" ></div>
+																																																								<input type="file">
+																																																								<div id="error-file-2" class="error-message text-danger" ></div>
+																																																								</div> #}
 
 
 			<button type="button" class="btn btn-primary next-step">
@@ -239,5 +252,4 @@
 		{{ form_end(form) }}
 
 	</div>
-
 {% endblock %}
