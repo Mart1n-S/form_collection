@@ -72,10 +72,7 @@
 			<div class="mb-3">
 				{% for key, actionItem in form.action %}
 					<div class="card">
-						<label for="association_action_{{key}}">
-							<span>🐋</span>
-							{{actionItem.vars.label}}
-						</label>
+						<span>🐋</span>
 						{{ form_widget(actionItem) }}
 					</div>
 				{% endfor %}
@@ -84,13 +81,13 @@
 
 			{# Créer 3 input file #}
 			{# <div id="container-input-file">
-																																																								<input type="file">
-																																																								<div id="error-file-0" class="error-message text-danger" ></div>
-																																																								<input type="file">
-																																																								<div id="error-file-1" class="error-message text-danger" ></div>
-																																																								<input type="file">
-																																																								<div id="error-file-2" class="error-message text-danger" ></div>
-																																																								</div> #}
+																																																																																<input type="file">
+																																																																																<div id="error-file-0" class="error-message text-danger" ></div>
+																																																																																<input type="file">
+																																																																																<div id="error-file-1" class="error-message text-danger" ></div>
+																																																																																<input type="file">
+																																																																																<div id="error-file-2" class="error-message text-danger" ></div>
+																																																																																</div> #}
 
 
 			<button type="button" class="btn btn-primary next-step">
@@ -252,4 +249,28 @@
 		{{ form_end(form) }}
 
 	</div>
+{% endblock %}
+
+
+{% block javascripts %}
+
+	{{parent()}}
+
+
+	<script defer>
+
+		$(document).ready(function () { // Sélectionner chaque carte contenant un formulaire
+$('.card').each(function () { // Sélectionner le <label> généré par form_widget
+var $label = $(this).find('label');
+
+// Sélectionner le <span>
+var $span = $(this).find('span');
+
+// Si le label et le span existent, insérer le span au début du label
+if ($label.length && $span.length) {
+$label.prepend($span); // Ajoute le span au début du label
+}
+});
+});
+	</script>
 {% endblock %}
