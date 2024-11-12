@@ -26,17 +26,17 @@ class PurgeOldZipsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setDescription('Purge les fichiers ZIP non téléchargés dans un certain délai (en minutes)')
-            ->addOption('minutes', null, InputOption::VALUE_OPTIONAL, 'Nombre de minutes avant de purger les fichiers ZIP', 60);
+            ->setDescription('Purge les fichiers ZIP non téléchargés dans un certain délai (en jours)')
+            ->addOption('days', null, InputOption::VALUE_OPTIONAL, 'Nombre de jours avant de purger les fichiers ZIP', 7);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $filesystem = new Filesystem();
-        $minutes = (int) $input->getOption('minutes');
+        $days = (int) $input->getOption('days');
         $now = time();
-        $purgeBefore = $now - ($minutes * 60); // Convertir les minutes en secondes
+        $purgeBefore = $now - ($days * 86400); // Convertir les jours en secondes (86400 secondes = 1 jour)
 
         // Démarrer la mesure du temps
         $startTime = microtime(true);
