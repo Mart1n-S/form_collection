@@ -47,6 +47,40 @@
 	</div>
 {% endmacro %}
 
+
+{# {%- macro render_radio(actionItem) -%}
+	<div class="card">
+		<label
+			for="{{ actionItem.vars.id }}">
+			<!-- Dynamique: associer une image différente selon l'option -->
+			<img
+			src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}">
+			<!-- Affichage du label du choix -->
+			{{ actionItem.vars.label }}
+		</label>
+
+		<!-- Rendre uniquement le bouton radio avec tous ses attributs -->
+		<input type="radio" id="{{ actionItem.vars.id }}" name="{{ actionItem.vars.full_name }}" value="{{ actionItem.vars.value }}" {% if actionItem.vars.checked %} checked {% endif %} {% if actionItem.vars.disabled %} disabled {% endif %} {% if actionItem.vars.required %} required {% endif %}>
+	</div>
+{%- endmacro -%} #}
+
+{%- macro render_radio(actionItem) -%}
+	<div class="card">
+		<label
+			for="{{ actionItem.vars.id }}" {%- if actionItem.vars.checked %} class="action-checked" {%- endif %}>
+			<!-- Dynamique: associer une image différente selon l'option -->
+			<img
+			src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}">
+			<!-- Affichage du label du choix -->
+			{{ actionItem.vars.label }}
+		</label>
+
+		<!-- Rendre uniquement le bouton radio avec tous ses attributs -->
+		<input type="radio" id="{{ actionItem.vars.id }}" name="{{ actionItem.vars.full_name }}" value="{{ actionItem.vars.value }}" {% if actionItem.vars.checked %} checked {% endif %} {% if actionItem.vars.disabled %} disabled {% endif %} {% if actionItem.vars.required %} required {% endif %}>
+	</div>
+{%- endmacro -%}
+
+
 {% import _self as formMacros %}
 
 {% extends 'base.html.twig' %}
@@ -70,24 +104,24 @@
 			</div>
 
 			<div class="mb-3">
-				{% for key, actionItem in form.action %}
-					<div class="card">
-						<span>🐋</span>
-						{{ form_widget(actionItem) }}
-					</div>
+				{% do form.action.setRendered %}
+
+				{% for actionItem in form.action %}
+					{{ formMacros.render_radio(actionItem) }}
+
 				{% endfor %}
 			</div>
 
 
 			{# Créer 3 input file #}
 			{# <div id="container-input-file">
-																																																																																<input type="file">
-																																																																																<div id="error-file-0" class="error-message text-danger" ></div>
-																																																																																<input type="file">
-																																																																																<div id="error-file-1" class="error-message text-danger" ></div>
-																																																																																<input type="file">
-																																																																																<div id="error-file-2" class="error-message text-danger" ></div>
-																																																																																</div> #}
+																																																																																																																							<input type="file">
+																																																																																																																							<div id="error-file-0" class="error-message text-danger" ></div>
+																																																																																																																							<input type="file">
+																																																																																																																							<div id="error-file-1" class="error-message text-danger" ></div>
+																																																																																																																							<input type="file">
+																																																																																																																							<div id="error-file-2" class="error-message text-danger" ></div>
+																																																																																																																							</div> #}
 
 
 			<button type="button" class="btn btn-primary next-step">
