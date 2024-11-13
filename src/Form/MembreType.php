@@ -42,32 +42,32 @@ class MembreType extends AbstractType
             ->add('cni', FileType::class, [
                 'mapped' => true,
                 'required' => false,
-                'constraints' => [
-                    new Assert\File([
-                        'maxSize' => '12M',
-                        'mimeTypes' => [
-                            'application/pdf',
-                            'image/jpeg',
-                        ],
-                        'mimeTypesMessage' => 'Veuillez télécharger un document PDF valide.',
-                        'maxSizeMessage' => 'Le fichier est trop volumineux. La taille maximale autorisée est de {{ limit }} {{ suffix }}.',
-                    ]),
-                ],
+                // 'constraints' => [
+                //     new Assert\File([
+                //         'maxSize' => '12M',
+                //         'mimeTypes' => [
+                //             'application/pdf',
+                //             'image/jpeg',
+                //         ],
+                //         'mimeTypesMessage' => 'Veuillez télécharger un document PDF valide.',
+                //         'maxSizeMessage' => 'Le fichier est trop volumineux. La taille maximale autorisée est de {{ limit }} {{ suffix }}.',
+                //     ]),
+                // ],
             ])
             ->add('justificatifDomicile', FileType::class, [
                 'mapped' => true,
                 'required' => false,
-                'constraints' => [
-                    new Assert\File([
-                        'maxSize' => '12M',
-                        'mimeTypes' => [
-                            'application/jpg',
-                            'image/jpeg',
-                        ],
-                        'mimeTypesMessage' => 'Veuillez télécharger un document PDF valide.',
-                        'maxSizeMessage' => 'Le fichier est trop volumineux. La taille maximale autorisée est de {{ limit }} {{ suffix }}.',
-                    ]),
-                ],
+                // 'constraints' => [
+                //     new Assert\File([
+                //         'maxSize' => '12M',
+                //         'mimeTypes' => [
+                //             'application/jpg',
+                //             'image/jpeg',
+                //         ],
+                //         'mimeTypesMessage' => 'Veuillez télécharger un document PDF valide.',
+                //         'maxSizeMessage' => 'Le fichier est trop volumineux. La taille maximale autorisée est de {{ limit }} {{ suffix }}.',
+                //     ]),
+                // ],
             ])
         ;
     }

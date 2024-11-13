@@ -364,9 +364,116 @@ class AssociationController extends AbstractController
         return $response;
     }
 
+    // #[Route('/association/file/download/{folder}/{filename}', name: 'association_download_file')]
+    // public function downloadFile(string $folder, string $filename, DowloadTokenRepository $dowloadTokenRepository): StreamedResponse
+    // {
+    //     // Rechercher le DownloadToken en fonction du dossier
+    //     $downloadToken = $dowloadTokenRepository->findOneBy(['folderPath' => $folder]);
+    //     if (!$downloadToken) {
+    //         throw $this->createNotFoundException('Token invalide.');
+    //     }
+
+    //     // Chemin vers le répertoire des téléchargements
+    //     $uploadDirectory = $this->getParameter('uploads_directory') . '/' . $folder;
+    //     $filePath = $uploadDirectory . '/' . $filename;
+
+    //     // Vérifier que le fichier existe
+    //     if (!file_exists($filePath)) {
+    //         throw $this->createNotFoundException('Fichier non trouvé.');
+    //     }
+
+    //     // Créer une réponse StreamedResponse pour envoyer le fichier en streaming
+    //     $response = new StreamedResponse(function () use ($filePath) {
+    //         // Ouvrir le fichier et envoyer son contenu
+    //         $file = fopen($filePath, 'rb');
+    //         while (!feof($file)) {
+    //             echo fread($file, 1024); // Lire 1 Ko à la fois
+    //             flush(); // S'assurer que les données sont envoyées au client
+    //         }
+    //         fclose($file); // Fermer le fichier après envoi
+    //     });
+
+    //     // Définir les en-têtes pour le téléchargement du fichier
+    //     $response->headers->set('Content-Type', 'application/octet-stream');
+    //     $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+    //         ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+    //         $filename
+    //     ));
+
+    //     // Enregistrer la fonction de suppression du fichier et du répertoire après le téléchargement
+    //     register_shutdown_function(function () use ($filePath, $uploadDirectory, $dowloadTokenRepository, $downloadToken) {
+    //         // Supprimer le fichier après qu'il ait été téléchargé
+    //         if (file_exists($filePath)) {
+    //             unlink($filePath);
+    //         }
+
+    //         // Vérifier si le répertoire est vide après la suppression du fichier
+    //         $remainingFiles = array_diff(scandir($uploadDirectory), ['.', '..']);
+    //         if (empty($remainingFiles)) {
+    //             // Si le répertoire est vide, supprimer le répertoire
+    //             rmdir($uploadDirectory);
+    //             // Supprimer le token après le téléchargement
+    //             $dowloadTokenRepository->remove($downloadToken, true);
+    //         }
+    //     });
+
+    //     // Retourner la réponse de streaming
+    //     return $response;
+    // }
+
+
+    // Methode 1 binary
+    // #[Route('/association/file/download/{folder}/{filename}', name: 'association_download_file')]
+    // public function downloadFile(string $folder, string $filename, DowloadTokenRepository $dowloadTokenRepository): BinaryFileResponse
+    // {
+    //     // Rechercher le DownloadToken en fonction du dossier
+    //     $downloadToken = $dowloadTokenRepository->findOneBy(['folderPath' => $folder]);
+    //     if (!$downloadToken) {
+    //         throw $this->createNotFoundException('Token invalide.');
+    //     }
+
+    //     // Chemin vers le répertoire des téléchargements
+    //     $uploadDirectory = $this->getParameter('uploads_directory') . '/' . $folder;
+    //     $filePath = $uploadDirectory . '/' . $filename;
+
+    //     // Vérifier que le fichier existe
+    //     if (!file_exists($filePath)) {
+    //         throw $this->createNotFoundException('Fichier non trouvé.');
+    //     }
+
+    //     // Utiliser BinaryFileResponse pour envoyer le fichier
+    //     $response = new BinaryFileResponse($filePath);
+    //     $response->setContentDisposition(
+    //         ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+    //         $filename
+    //     );
+
+    //     // Enregistrer une fonction de suppression pour le fichier et le répertoire
+    //     register_shutdown_function(function () use ($filePath, $uploadDirectory, $dowloadTokenRepository, $downloadToken) {
+    //         // Supprimer le fichier après le téléchargement
+    //         if (file_exists($filePath)) {
+    //             unlink($filePath);
+    //         }
+
+    //         // Vérifier si le répertoire est vide après suppression du fichier
+    //         $remainingFiles = array_diff(scandir($uploadDirectory), ['.', '..']);
+    //         if (empty($remainingFiles)) {
+    //             // Si le répertoire est vide, supprimer le répertoire
+    //             rmdir($uploadDirectory);
+    //             // Supprimer le token associé
+    //             $dowloadTokenRepository->remove($downloadToken, true);
+    //         }
+    //     });
+
+    //     return $response;
+    // }
+
+    // Methode 2 binary
     #[Route('/association/file/download/{folder}/{filename}', name: 'association_download_file')]
-    public function downloadFile(string $folder, string $filename, DowloadTokenRepository $dowloadTokenRepository): StreamedResponse
+    public function downloadFile(string $folder, string $filename, DowloadTokenRepository $dowloadTokenRepository): BinaryFileResponse
     {
+        $downloadSuccess = false; // Indicateur de succès du téléchargement
+
         // Rechercher le DownloadToken en fonction du dossier
         $downloadToken = $dowloadTokenRepository->findOneBy(['folderPath' => $folder]);
         if (!$downloadToken) {
@@ -382,42 +489,42 @@ class AssociationController extends AbstractController
             throw $this->createNotFoundException('Fichier non trouvé.');
         }
 
-        // Créer une réponse StreamedResponse pour envoyer le fichier en streaming
-        $response = new StreamedResponse(function () use ($filePath) {
-            // Ouvrir le fichier et envoyer son contenu
-            $file = fopen($filePath, 'rb');
-            while (!feof($file)) {
-                echo fread($file, 1024); // Lire 1 Ko à la fois
-                flush(); // S'assurer que les données sont envoyées au client
-            }
-            fclose($file); // Fermer le fichier après envoi
-        });
+        try {
+            // Utiliser BinaryFileResponse pour envoyer le fichier
+            $response = new BinaryFileResponse($filePath);
+            $response->setContentDisposition(
+                ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+                $filename
+            );
 
-        // Définir les en-têtes pour le téléchargement du fichier
-        $response->headers->set('Content-Type', 'application/octet-stream');
-        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
-            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $filename
-        ));
+            // Marquer le téléchargement comme réussi avant de retourner la réponse
+            $downloadSuccess = true;
 
-        // Enregistrer la fonction de suppression du fichier et du répertoire après le téléchargement
-        register_shutdown_function(function () use ($filePath, $uploadDirectory, $dowloadTokenRepository, $downloadToken) {
-            // Supprimer le fichier après qu'il ait été téléchargé
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
+            return $response;
+        } catch (\Exception $e) {
+            // Gestion des erreurs de téléchargement ici si nécessaire
+            throw $this->createNotFoundException('Erreur lors du téléchargement.');
+        } finally {
+            register_shutdown_function(function () use (
+                $filePath,
+                $uploadDirectory,
+                $dowloadTokenRepository,
+                $downloadToken,
+                &$downloadSuccess
+            ) {
+                // Ne supprimer le fichier et le répertoire que si le téléchargement a réussi
+                if ($downloadSuccess) {
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
 
-            // Vérifier si le répertoire est vide après la suppression du fichier
-            $remainingFiles = array_diff(scandir($uploadDirectory), ['.', '..']);
-            if (empty($remainingFiles)) {
-                // Si le répertoire est vide, supprimer le répertoire
-                rmdir($uploadDirectory);
-                // Supprimer le token après le téléchargement
-                $dowloadTokenRepository->remove($downloadToken, true);
-            }
-        });
-
-        // Retourner la réponse de streaming
-        return $response;
+                    $remainingFiles = array_diff(scandir($uploadDirectory), ['.', '..']);
+                    if (empty($remainingFiles)) {
+                        rmdir($uploadDirectory);
+                        $dowloadTokenRepository->remove($downloadToken, true);
+                    }
+                }
+            });
+        }
     }
 }

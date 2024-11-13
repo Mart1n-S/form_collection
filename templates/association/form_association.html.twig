@@ -69,8 +69,8 @@
 		<label
 			for="{{ actionItem.vars.id }}" {%- if actionItem.vars.checked %} class="action-checked" {%- endif %}>
 			<!-- Dynamique: associer une image différente selon l'option -->
-			<img
-			src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}">
+			{# <img
+			src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}"> #}
 			<!-- Affichage du label du choix -->
 			{{ actionItem.vars.label }}
 		</label>
