@@ -23,6 +23,9 @@ services:
   App\Command\PurgeOldZipsCommand:
     arguments:
       $uploadDirectory: "%uploads_directory%"
+  App\Service\VerificationService:
+    arguments:
+      $env: "%kernel.environment%"
 
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones

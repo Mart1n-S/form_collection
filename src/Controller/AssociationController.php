@@ -9,6 +9,8 @@ use Symfony\Component\Mime\Email;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssociationRepository;
 use App\Repository\DowloadTokenRepository;
+use App\Service\VerificationService;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,9 +23,14 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AssociationController extends AbstractController
 {
+    public function __construct(private VerificationService $checkEnvironment, private LoggerInterface $loggerInterface) {}
+
     #[Route('/association', name: 'app_association')]
     public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
     {
+        // Vérifier l'environnement
+        $environment = $this->checkEnvironment->verifySomething();
+        // dump($environment);
         // Créer une nouvelle instance d'Association
         $association = new Association();
 
@@ -360,6 +367,12 @@ class AssociationController extends AbstractController
 
         // Supprimer le token après le téléchargement
         $dowloadTokenRepository->remove($downloadToken, true);
+
+        $this->loggerInterface->info('Document téléchargé', [
+            'user' => 'B512345',
+            'folder' => $folder,
+            'timestamp' => new \DateTime(),
+        ]);
 
         return $response;
     }
