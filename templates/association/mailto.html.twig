@@ -1,0 +1,53 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+	<div class="container">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<h1 class="card-title mb-4">Modèle d'Email</h1>
+
+				<!-- Contenu de l'email -->
+				<div id="email-content" class="mb-3 p-3 border bg-white" style="white-space: pre-line;">
+					Bonjour [NOM] [PRÉNOM],
+																			
+																			Voici le formulaire d'entrée en relation.
+																			
+																			Merci de bien vouloir fournir les pièces justificatives suivantes :
+																			- Copie de votre pièce d'identité
+																			- Justificatif de domicile de moins de 3 mois
+																			
+																			Nous restons à votre disposition pour toute question.
+																			
+																			Cordialement,
+																			[Votre Nom / Signature]
+				</div>
+
+				<!-- Boutons -->
+				<div class="d-flex gap-3">
+					<button id="copy-btn" class="btn btn-success">Copier le texte</button>
+					<a id="mailto-link" class="btn btn-primary" href="#" target="_blank">Créer un email</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<script>
+		// Copier le texte
+document.getElementById('copy-btn').addEventListener('click', function () {
+const emailContent = document.getElementById('email-content').innerText;
+
+navigator.clipboard.writeText(emailContent).then(() => alert('Texte copié avec succès !')).catch((err) => console.error('Erreur lors de la copie :', err));
+});
+
+// Générer un lien mailto
+const emailContent = document.getElementById('email-content').innerText;
+const subject = "Formulaire d'entrée en relation";
+const mailBody = encodeURIComponent(emailContent.trim());
+const mailToLink = `mailto:?subject=${
+encodeURIComponent(subject)
+}&body=${mailBody}`;
+document.getElementById('mailto-link').href = mailToLink;
+	</script>
+
+{% endblock %}

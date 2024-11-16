@@ -540,4 +540,10 @@ class AssociationController extends AbstractController
             });
         }
     }
+
+    #[Route('/mailto', name: 'app_mailto')]
+    public function mailto(): Response
+    {
+        return $this->render('association/mailto.html.twig');
+    }
 }
