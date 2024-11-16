@@ -105,9 +105,85 @@ $(document).ready(function () {
     // Ajout dynamique des documents du membre
     addItemDoc(index);
 
+    addAddressSuggestions(index);
+
     index++;
     itemsCountValue++;
     checkItemsCount();
+  }
+
+  function addAddressSuggestions(index) {
+    const adresseInput = $(`#association_membres_${index}_adresse`);
+    const villeInput = $(`#association_membres_${index}_ville`);
+    const codePostalInput = $(`#association_membres_${index}_codePostal`);
+    const suggestionsList = $(`#address-suggestions-${index}`);
+
+    adresseInput.off("input").on("input", function () {
+      const query = adresseInput.val().trim();
+
+      // Si la recherche contient au moins 3 caractères
+      if (query.length >= 3) {
+        $.ajax({
+          url: `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(
+            query
+          )}&limit=5`,
+          method: "GET",
+          success: function (data) {
+            // Vider la liste des suggestions à chaque nouvelle recherche
+            suggestionsList.empty();
+
+            if (data.features && data.features.length > 0) {
+              // Affichage des résultats
+              data.features.forEach(function (feature) {
+                const suggestionItem = $("<li>")
+                  .addClass("list-group-item")
+                  .addClass("cursor-pointer")
+                  .text(feature.properties.label);
+
+                // Ajout de l'événement pour remplir les champs lorsque l'utilisateur sélectionne une adresse
+                suggestionItem.on("click", function () {
+                  adresseInput.val(feature.properties.label);
+                  villeInput.val(feature.properties.city);
+                  codePostalInput.val(feature.properties.postcode);
+                  suggestionsList.empty(); // Vider la liste
+                  suggestionsList.hide(); // Cacher la liste
+                });
+
+                suggestionsList.append(suggestionItem); // Ajouter la suggestion à la liste
+              });
+
+              suggestionsList.show(); // Afficher la liste des résultats
+            } else {
+              // Si aucun résultat trouvé, afficher un message
+              const noResultItem = $("<li>")
+                .addClass("list-group-item")
+                .text("Aucun résultat ne correspond à votre recherche");
+
+              suggestionsList.append(noResultItem);
+              suggestionsList.show(); // Afficher la liste
+            }
+          },
+          error: function () {
+            console.error("Erreur lors de la recherche d'adresses.");
+          },
+        });
+      } else {
+        // Si l'utilisateur tape moins de 3 caractères, cacher la liste
+        suggestionsList.empty();
+        suggestionsList.hide();
+      }
+    });
+
+    // Fermer la liste si l'utilisateur clique ailleurs
+    $(document).on("click", function (event) {
+      if (
+        !adresseInput.is(event.target) &&
+        !suggestionsList.is(event.target) &&
+        !suggestionsList.has(event.target).length
+      ) {
+        suggestionsList.hide(); // Cacher la liste
+      }
+    });
   }
 
   // <---------Rajout de code pour gérer lorsqu'il y a une erreur on remet tout a sa place et on attache les bons elements---------->

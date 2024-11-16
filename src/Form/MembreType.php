@@ -8,6 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use PHPUnit\TextUI\XmlConfiguration\File;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -38,6 +39,29 @@ class MembreType extends AbstractType
                 'required' => true,
                 // Gérer message d'erreur pour un champ de type EntityType
                 'invalid_message' => 'Le statut sélectionné n\'est pas valide.',
+            ])
+            ->add('adresse', TextType::class, [
+                "attr" => [
+                    "class" => "form-control",
+                    "required" => true,
+                ],
+                'constraints' => [
+                    new NotNull([
+                        'message' => 'L\'adresse ne peut pas être vide.',
+                    ]),
+                ],
+            ])
+            ->add('ville', TextType::class, [
+                "attr" => [
+                    "class" => "form-control",
+                    "required" => true,
+                ],
+            ])
+            ->add('codePostal', TextType::class, [
+                "attr" => [
+                    "class" => "form-control",
+                    "required" => true,
+                ],
             ])
             ->add('cni', FileType::class, [
                 'mapped' => true,

@@ -32,6 +32,15 @@ class Membre
     #[ORM\JoinColumn(nullable: false)]
     private ?Association $association = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $adresse = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $ville = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $codePostal = null;
+
     private $cni;
 
     private $justificatifDomicile;
@@ -138,6 +147,42 @@ class Membre
     public function setJustificatifDomicile($justificatifDomicile): static
     {
         $this->justificatifDomicile = $justificatifDomicile;
+
+        return $this;
+    }
+
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+
+    public function setAdresse(string $adresse): static
+    {
+        $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+
+    public function setVille(string $ville): static
+    {
+        $this->ville = $ville;
+
+        return $this;
+    }
+
+    public function getCodePostal(): ?string
+    {
+        return $this->codePostal;
+    }
+
+    public function setCodePostal(string $codePostal): static
+    {
+        $this->codePostal = $codePostal;
 
         return $this;
     }

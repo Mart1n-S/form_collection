@@ -20,6 +20,32 @@
 					{{ form_row(member.statut) }}
 
 				</div>
+				<div>
+					<div class="mb-3 has-validation">
+						{{ form_label(member.adresse) }}
+						{{ form_widget(member.adresse) }}
+						<div class="invalid-feedback">
+							{{ form_errors(member.adresse) }}
+						</div>
+						<ul id="address-suggestions-__name__" class="list-group"></ul>
+
+
+					</div>
+					<div class="mb-3 has-validation">
+						{{ form_row(member.ville) }}
+						<div class="invalid-feedback">
+							{{ form_errors(member.ville) }}
+						</div>
+					</div>
+
+					<div class="mb-3 has-validation">
+						{{ form_row(member.codePostal) }}
+						<div class="invalid-feedback">
+							{{ form_errors(member.codePostal) }}
+						</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 
@@ -66,18 +92,16 @@
 
 {%- macro render_radio(actionItem) -%}
 	<div class="card">
-		<label
-			for="{{ actionItem.vars.id }}" {%- if actionItem.vars.checked %} class="action-checked" {%- endif %}>
+		<label for="{{ actionItem.vars.id }}" {%- if actionItem.vars.checked %} class="action-checked" {%- endif %}>
 			<!-- Dynamique: associer une image différente selon l'option -->
 			{# <img
-			src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}"> #}
+																																																src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}"> #}
 			<!-- Affichage du label du choix -->
-			{{ actionItem.vars.label }}
+		{{ actionItem.vars.label }}
 		</label>
 
 		<!-- Rendre uniquement le bouton radio avec tous ses attributs -->
-		<input type="radio" id="{{ actionItem.vars.id }}" name="{{ actionItem.vars.full_name }}" value="{{ actionItem.vars.value }}" {% if actionItem.vars.checked %} checked {% endif %} {% if actionItem.vars.disabled %} disabled {% endif %} {% if actionItem.vars.required %} required {% endif %}>
-	</div>
+	<input type="radio" id="{{ actionItem.vars.id }}" name="{{ actionItem.vars.full_name }}" value="{{ actionItem.vars.value }}" {% if actionItem.vars.checked %} checked {% endif %} {% if actionItem.vars.disabled %} disabled {% endif %} {% if actionItem.vars.required %} required {% endif %}> </div>
 {%- endmacro -%}
 
 
@@ -115,13 +139,13 @@
 
 			{# Créer 3 input file #}
 			{# <div id="container-input-file">
-																																																																																																																							<input type="file">
-																																																																																																																							<div id="error-file-0" class="error-message text-danger" ></div>
-																																																																																																																							<input type="file">
-																																																																																																																							<div id="error-file-1" class="error-message text-danger" ></div>
-																																																																																																																							<input type="file">
-																																																																																																																							<div id="error-file-2" class="error-message text-danger" ></div>
-																																																																																																																							</div> #}
+																																																																																																																																																																				<input type="file">
+																																																																																																																																																																				<div id="error-file-0" class="error-message text-danger" ></div>
+																																																																																																																																																																				<input type="file">
+																																																																																																																																																																				<div id="error-file-1" class="error-message text-danger" ></div>
+																																																																																																																																																																				<input type="file">
+																																																																																																																																																																				<div id="error-file-2" class="error-message text-danger" ></div>
+																																																																																																																																																																				</div> #}
 
 
 			<button type="button" class="btn btn-primary next-step">
@@ -158,12 +182,33 @@
 			<div class="mb-3">
 				{{ form_row(form.email) }}
 			</div>
-			<div class="mb-3 has-validation">
-				{{ form_widget(form.adresse) }}
-				<div class="invalid-feedback">
-					{{ form_errors(form.adresse) }}
+			<div>
+				<div class="mb-3 has-validation">
+					{{ form_label(form.adresse) }}
+					{{ form_widget(form.adresse) }}
+					<div class="invalid-feedback">
+						{{ form_errors(form.adresse) }}
+					</div>
+					<ul id="address-suggestions" class="list-group"></ul>
+
+
+				</div>
+				<div class="mb-3 has-validation">
+					{{ form_row(form.ville) }}
+					<div class="invalid-feedback">
+						{{ form_errors(form.ville) }}
+					</div>
+				</div>
+
+				<div class="mb-3 has-validation">
+					{{ form_row(form.codePostal) }}
+					<div class="invalid-feedback">
+						{{ form_errors(form.codePostal) }}
+					</div>
 				</div>
 			</div>
+
+
 			<button type="button" class="btn btn-primary previous-step">
 				Precedent
 				<i class="fas fa-arrow-right"></i>

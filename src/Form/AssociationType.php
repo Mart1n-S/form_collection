@@ -72,17 +72,24 @@ class AssociationType extends AbstractType
             ->add('adresse', TextType::class, [
                 "attr" => [
                     "class" => "form-control",
-                    "maxlength" => 8,
                     "required" => true,
                 ],
                 'constraints' => [
-                    new Length([
-                        'max' => 8,
-                        'maxMessage' => 'L\'adresse ne peut pas dépasser {{ limit }} caractères.',
-                    ]),
                     new NotNull([
                         'message' => 'L\'adresse ne peut pas être vide.',
                     ]),
+                ],
+            ])
+            ->add('ville', TextType::class, [
+                "attr" => [
+                    "class" => "form-control",
+                    "required" => true,
+                ],
+            ])
+            ->add('codePostal', TextType::class, [
+                "attr" => [
+                    "class" => "form-control",
+                    "required" => true,
                 ],
             ])
             ->add('membres', CollectionType::class, [
