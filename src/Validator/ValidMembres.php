@@ -1,6 +1,6 @@
 <?php
-// src/Validator/Constraints/ValidMembres.php
-namespace App\Validator\Constraints;
+// Fix retirer changer App\Validator\Consraint par App\Validator car le fichier se trouve dans le dossier Validator et plus dans le dossier Validator/Constraint => idem pour l'appek dans l'entité
+namespace App\Validator;
 
 use Symfony\Component\Validator\Constraint;
 
