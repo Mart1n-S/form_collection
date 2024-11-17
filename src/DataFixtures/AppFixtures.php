@@ -21,13 +21,19 @@ class AppFixtures extends Fixture
             $manager->persist($newStatut);
         }
 
-        $nameAction = ['Sport en famille', 'Etudiant', 'Ecologie'];
+        $actions = [
+            'Sport en famille',
+            'Étudiant',
+            'Écologie',
+        ];
 
-        foreach ($nameAction as $name) {
-            $newAction = new Action();
-            $newAction->setNameAction($name);
+        // Création des entités Action
+        foreach ($actions as $index => $name) {
+            $action = new Action();
+            $action->setNameAction($name);
+            $action->setIndex($index); // Assurez-vous que cette propriété existe dans votre entité
 
-            $manager->persist($newAction);
+            $manager->persist($action);
         }
 
 

@@ -16,6 +16,9 @@ class Action
     #[ORM\Column(length: 255)]
     private ?string $nameAction = null;
 
+    #[ORM\Column]
+    private ?string $indexAction = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -29,6 +32,18 @@ class Action
     public function setNameAction(string $nameAction): static
     {
         $this->nameAction = $nameAction;
+
+        return $this;
+    }
+
+    public function getIndex(): ?string
+    {
+        return $this->indexAction;
+    }
+
+    public function setIndex(string $indexAction): static
+    {
+        $this->indexAction = $indexAction;
 
         return $this;
     }

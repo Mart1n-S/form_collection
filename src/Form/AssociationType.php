@@ -57,15 +57,13 @@ class AssociationType extends AbstractType
             // Option2
             ->add('action', EntityType::class, [
                 'class' => Action::class,
-                'choice_label' => fn(Action $action) => $action->getNameAction(),  // Utiliser la fonction pour récupérer un nom personnalisé
-                'multiple' => false,  // Permet de ne sélectionner qu'une seule action
-                'expanded' => true,   // Affiche sous forme de boutons radio
-                'choice_attr' => function ($action) {
-                    return [
-                        'class' => 'btn-check mandatory',  // Ajouter des classes ou d'autres attributs
-                        'data-id' => $action->getId()  // Exemple d'attribut personnalisé
-                    ];
-                },
+                'choice_label' => fn(Action $action) => $action->getNameAction(), // Utilise le nom comme étiquette
+                'multiple' => true,  // Permet de sélectionner plusieurs actions
+                'expanded' => true,   // Affiche sous forme de cases à cocher
+                'choice_value' => fn(?Action $action) => $action ? $action->getIndex() : '',
+                'choice_attr' => fn(Action $action) => [
+                    'data-id' => $action->getId(),
+                ],
             ])
 
             ->add('email', EmailType::class)
