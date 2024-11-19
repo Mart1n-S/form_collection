@@ -95,7 +95,7 @@
 		<label for="{{ actionItem.vars.id }}" {%- if actionItem.vars.checked %} class="action-checked" {%- endif %}>
 			<!-- Dynamique: associer une image différente selon l'option -->
 			{# <img
-																																																src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}"> #}
+																																																																											src="{{ asset('images/' ~ actionItem.vars.label ~ '.png') }}" class="w-25" alt="{{ actionItem.vars.label }}"> #}
 			<!-- Affichage du label du choix -->
 		{{ actionItem.vars.label }}
 		</label>
@@ -123,6 +123,9 @@
 		<!-- Étape 1 -->
 		<div id="step-1" class="step">
 			<h2>Étape 1: Informations sur l'Association</h2>
+			<button class="btn btn-primary" type="button" onclick="autofillStep1()">Auto-remplir</button>
+
+
 			<div class="mb-3">
 				{{ form_row(form.nom) }}
 			</div>
@@ -139,13 +142,13 @@
 
 			{# Créer 3 input file #}
 			{# <div id="container-input-file">
-																																																																																																																																																																				<input type="file">
-																																																																																																																																																																				<div id="error-file-0" class="error-message text-danger" ></div>
-																																																																																																																																																																				<input type="file">
-																																																																																																																																																																				<div id="error-file-1" class="error-message text-danger" ></div>
-																																																																																																																																																																				<input type="file">
-																																																																																																																																																																				<div id="error-file-2" class="error-message text-danger" ></div>
-																																																																																																																																																																				</div> #}
+																																																																																																																																																																																															<input type="file">
+																																																																																																																																																																																															<div id="error-file-0" class="error-message text-danger" ></div>
+																																																																																																																																																																																															<input type="file">
+																																																																																																																																																																																															<div id="error-file-1" class="error-message text-danger" ></div>
+																																																																																																																																																																																															<input type="file">
+																																																																																																																																																																																															<div id="error-file-2" class="error-message text-danger" ></div>
+																																																																																																																																																																																															</div> #}
 
 
 			<button type="button" class="btn btn-primary next-step">
@@ -333,23 +336,32 @@
 
 {% block javascripts %}
 
-	{{parent()}}
+{{parent()}}
 
 
-	<script defer>
-
-		$(document).ready(function () { // Sélectionner chaque carte contenant un formulaire
-$('.card').each(function () { // Sélectionner le <label> généré par form_widget
-var $label = $(this).find('label');
-
-// Sélectionner le <span>
-var $span = $(this).find('span');
-
-// Si le label et le span existent, insérer le span au début du label
-if ($label.length && $span.length) {
-$label.prepend($span); // Ajoute le span au début du label
-}
-});
-});
-	</script>
-{% endblock %}
+<script defer>
+	{# Mettre un ecouteur d'evenement sur un input #}
+					$('#association_nom').on('input change', function () {
+						console.log('Input event');
+					});
+					
+							function autofillStep1() {
+	$('#association_nom').val('John Doe').trigger('input');
+	
+					
+					}
+					$(document).ready(function () { // Sélectionner chaque carte contenant un formulaire
+					$('.card').each(function () { // Sélectionner le <label> généré par form_widget
+					var $label = $(this).find('label');
+					
+					// Sélectionner le <span>
+					var $span = $(this).find('span');
+					
+					// Si le label et le span existent, insérer le span au début du label
+					if ($label.length && $span.length) {
+					$label.prepend($span); // Ajoute le span au début du label
+					}
+					});
+					});
+						</script>
+					{% endblock %}
