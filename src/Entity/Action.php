@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ActionRepository;
+use App\Entity\Categorie;
+use App\Entity\Association;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\ActionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: ActionRepository::class)]
 class Action
@@ -18,6 +21,19 @@ class Action
 
     #[ORM\Column]
     private ?string $indexAction = null;
+
+    #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: 'actions')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $categorie;
+
+
+    #[ORM\ManyToMany(targetEntity: Association::class, mappedBy: 'actions')]
+    private $associations;
+
+    public function __construct()
+    {
+        $this->associations = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -46,5 +62,22 @@ class Action
         $this->indexAction = $indexAction;
 
         return $this;
+    }
+
+    public function getCategorie(): ?Categorie
+    {
+        return $this->categorie;
+    }
+
+    public function setCategorie(Categorie $categorie): self
+    {
+        $this->categorie = $categorie;
+
+        return $this;
+    }
+
+    public function getAssociations(): ArrayCollection
+    {
+        return $this->associations;
     }
 }

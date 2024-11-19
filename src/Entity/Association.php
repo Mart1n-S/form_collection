@@ -2,14 +2,15 @@
 
 namespace App\Entity;
 
+use App\Entity\Action;
 use App\Entity\Membre;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Validator as CustomAssert;
 use App\Repository\AssociationRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Validator as CustomAssert;
 
 
 #[ORM\Entity(repositoryClass: AssociationRepository::class)]
@@ -46,11 +47,13 @@ class Association
     #[Assert\Valid] // Valider chaque membre dans la collection
     private Collection $membres;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Action $action = null;
+    #[ORM\ManyToMany(targetEntity: Action::class, inversedBy: 'associations')]
+    #[ORM\JoinTable(name: 'asso_actions')]
+    private $actions;
+
     public function __construct()
     {
+        $this->actions = new ArrayCollection();
         $this->membres = new ArrayCollection();
     }
 
@@ -161,14 +164,24 @@ class Association
         return $this;
     }
 
-    public function getAction(): ?Action
+    // Getters et Setters
+    public function getActions(): ArrayCollection
     {
-        return $this->action;
+        return $this->actions;
     }
 
-    public function setAction(Action $action): static
+    public function addAction(Action $action): self
     {
-        $this->action = $action;
+        if (!$this->actions->contains($action)) {
+            $this->actions[] = $action;
+        }
+
+        return $this;
+    }
+
+    public function removeAction(Action $action): self
+    {
+        $this->actions->removeElement($action);
 
         return $this;
     }

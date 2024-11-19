@@ -2,15 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Categorie;
 use App\Entity\Association;
 use App\Entity\DowloadToken;
+use Psr\Log\LoggerInterface;
 use App\Form\AssociationType;
+use App\Repository\ActionRepository;
 use Symfony\Component\Mime\Email;
+use App\Service\VerificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssociationRepository;
 use App\Repository\DowloadTokenRepository;
-use App\Service\VerificationService;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +25,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AssociationController extends AbstractController
 {
-    public function __construct(private VerificationService $checkEnvironment, private LoggerInterface $loggerInterface) {}
+    public function __construct(private VerificationService $checkEnvironment, private LoggerInterface $loggerInterface, private ActionRepository $actionRepository) {}
 
     #[Route('/association', name: 'app_association')]
     public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer): Response
@@ -34,13 +36,31 @@ class AssociationController extends AbstractController
         // Créer une nouvelle instance d'Association
         $association = new Association();
 
+        $categories = $entityManager->getRepository(Categorie::class)->findAll();
         // Créer le formulaire
-        $form = $this->createForm(AssociationType::class, $association);
+        $form = $this->createForm(AssociationType::class, $association, [
+            'categories' => $categories,
+        ]);
 
         // Traitement de la requête
         $form->handleRequest($request);
         // dd($form->getData());
         if ($form->isSubmitted() && $form->isValid()) {
+
+            foreach ($categories as $categorie) {
+                // Récupérer les valeurs soumises pour chaque catégorie
+                $selectedActions = $form->get($categorie->getName())->getData();
+
+                if ($selectedActions) {
+                    // Associer les actions à l'association
+                    foreach ($selectedActions as $actionId) {
+                        $action = $this->actionRepository->find($actionId);
+                        if ($action) {
+                            $association->addAction($action);
+                        }
+                    }
+                }
+            }
 
             // Générer un token unique
             $token = bin2hex(random_bytes(16)); // 32 caractères hexadécimaux

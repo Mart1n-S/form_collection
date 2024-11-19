@@ -21,7 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Karser\Recaptcha3Bundle\Validator\Constraints\Recaptcha3;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class AssociationType extends AbstractType
@@ -34,6 +36,37 @@ class AssociationType extends AbstractType
     }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $categories = $options['categories']; // On passe les catégories au formulaire
+
+        // Ajouter les actions par catégorie sous forme de cases à cocher
+        foreach ($categories as $categorie) {
+            $actions = $this->actionRepository->findBy(['categorie' => $categorie]); // Récupérer les actions de la catégorie
+            $actionChoices = [];
+            $choiceAttributes = [];
+
+            foreach ($actions as $action) {
+                $actionChoices[$action->getNameAction()] = $action->getId();
+                $choiceAttributes[$action->getId()] = [
+                    'data-description' => 'TEESSSST',
+                    'data-index' => $action->getIndex(),
+                ];
+            }
+
+            $builder->add($categorie->getName(), ChoiceType::class, [
+                'label' => $categorie->getName(),
+                'required' => false,
+                'mapped' => false, // On ne mappe pas directement ces actions à l'entité Association
+                'expanded' => true, // Affichage sous forme de cases à cocher
+                'multiple' => true, // Permet de sélectionner plusieurs actions
+                'choices' => $actionChoices,
+                'choice_attr' => function ($choice, $key, $value) use ($choiceAttributes) {
+                    return $choiceAttributes[$value] ?? []; // Associe les attributs personnalisés
+                },
+                'attr' => ['class' => 'actions-category'],
+            ]);
+        }
+
+
         $builder
             ->add('nom', TextType::class)
             ->add('dateCreation', DateType::class, [
@@ -47,24 +80,7 @@ class AssociationType extends AbstractType
                     ]),
                 ],
             ])
-            // Option 1
-            // ->add('action', EntityType::class, [
-            //     'class' => Action::class,
-            //     'choice_label' => 'nameAction',
-            //     'multiple' => false, // Permet de ne sélectionner qu'une seule action
-            //     'expanded' => true, // Affiche les options sous forme de boutons radio
-            // ])
-            // Option2
-            ->add('action', EntityType::class, [
-                'class' => Action::class,
-                'choice_label' => fn(Action $action) => $action->getNameAction(), // Utilise le nom comme étiquette
-                'multiple' => true,  // Permet de sélectionner plusieurs actions
-                'expanded' => true,   // Affiche sous forme de cases à cocher
-                'choice_value' => fn(?Action $action) => $action ? $action->getIndex() : '',
-                'choice_attr' => fn(Action $action) => [
-                    'data-id' => $action->getId(),
-                ],
-            ])
+
 
             ->add('email', EmailType::class)
             ->add('adresse', TextType::class, [
@@ -102,13 +118,14 @@ class AssociationType extends AbstractType
             ->add('captcha', Recaptcha3Type::class, [
                 'constraints' => new Recaptcha3(),
                 'action_name' => 'captcha',
-            ]);;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Association::class,
+            'categories' => [],
         ]);
     }
 }

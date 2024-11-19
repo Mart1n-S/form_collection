@@ -100,7 +100,36 @@
 		<!-- Rendre uniquement le bouton radio avec tous ses attributs -->
 	<input type="radio" id="{{ actionItem.vars.id }}" name="{{ actionItem.vars.full_name }}" value="{{ actionItem.vars.value }}" {% if actionItem.vars.checked %} checked {% endif %} {% if actionItem.vars.disabled %} disabled {% endif %} {% if actionItem.vars.required %} required {% endif %}> </div>
 {%- endmacro -%} #}
+{% macro action_sport(action) %}
+ <div class="form-check">
+                   {% dump(action) %}         
+	<label class="form-check-label">
+		{{ action.vars.label }}
 
+		<input type="checkbox" id="{{action.vars.id}}" name="{{action.vars.full_name}}" value="{{action.vars.value}}">
+	</label>
+ </div>
+{% endmacro %}
+{% macro action_culture(action) %}
+ <div class="form-check">
+                            
+	<label class="form-check-label">
+		{{ action.vars.label }}
+
+		<input type="checkbox" id="{{action.vars.id}}" name="{{action.vars.full_name}}" value="{{action.vars.value}}">
+	</label>
+ </div>
+{% endmacro %}
+{% macro action_hum(action) %}
+ <div class="form-check">
+                            
+	<label class="form-check-label">
+		{{ action.vars.label }}
+
+		<input type="checkbox" id="{{action.vars.id}}" name="{{action.vars.full_name}}" value="{{action.vars.value}}">
+	</label>
+ </div>
+{% endmacro %}
 
 {% import _self as formMacros %}
 
@@ -125,27 +154,105 @@
 			</div>
 
 			<div class="mb-3">
+			 <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Sport</h5>
+                </div>
+                <div class="card-body">
+				{% do form.Sport.setRendered %}
+                    {% for action in form.Sport %}
+					{{ formMacros.action_sport(action) }}
+                    {% endfor %}
+                </div>
+            </div>
+
+            {# Afficher les actions pour la catégorie 'Culture' #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Culture</h5>
+                </div>
+                <div class="card-body">
+				{% do form.Culture.setRendered %}
+				{% for action in form.Culture %}
+					{{ formMacros.action_culture(action) }}
+				{% endfor %}
+                </div>
+            </div>
+
+            {# Afficher les actions pour la catégorie 'Humanitaire' #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Humanitaire</h5>
+                </div>
+                <div class="card-body">
+				{% do form.Humanitaire.setRendered %}
+				{% for action in form.Culture %}
+					{{ formMacros.action_hum(action) }}
+				{% endfor %}
+                </div>
+            </div>
+			{# {% for categorie, actions in form %}
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>{{ categorie.vars.label }}</h5>
+                        </div>
+                        <div class="card-body">
+                            {% for action in actions %}
+                                <div class="form-check">
+                                    {{ form_widget(action) }}
+                                    <label class="form-check-label">
+                                        {{ action.vars.label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %} #}
 				{# {% do form.action.setRendered %} #}
 				{# {{ form_widget(form.action) }} #}
-			{% dump(form.action.vars) %}
+				{# {% dump(form.action.vars) %} #}
+					{# <div class="card"> {% for action in formAsso.categorie['Sport'] %}
+						<div>
+							{{ action }}
+						</div>
+					{% endfor %}
+				</div>
+
+				<div class="card">
+					{% for action in formAsso.categorie['Culture'] %}
+						<div class="col-10">
+							{{ action }}
+						</div>
+					{% endfor %}
+				</div>
+
+				<div class="card">
+					{% for action in formAsso.categorie['Humanitaire'] %}
+						<div class="col-10 text-success">
+							{{ action }}
+						</div>
+					{% endfor %}
+				</div> #}
 
 
 				{# {% for actionItem in form.action %}
-																																													{{ formMacros.render_radio(actionItem) }}
-																																								
-																																												{% endfor %} #}
+																																																																																									{{ formMacros.render_radio(actionItem) }}
+																																																																																				
+																																																																																								{% endfor %} #}
 			</div>
 
 
 			{# Créer 3 input file #}
 			{# <div id="container-input-file">
-																																																																																																																																																																																																		<input type="file">
-																																																																																																																																																																																																		<div id="error-file-0" class="error-message text-danger" ></div>
-																																																																																																																																																																																																		<input type="file">
-																																																																																																																																																																																																		<div id="error-file-1" class="error-message text-danger" ></div>
-																																																																																																																																																																																																		<input type="file">
-																																																																																																																																																																																																		<div id="error-file-2" class="error-message text-danger" ></div>
-																																																																																																																																																																																																		</div> #}
+																																																																																																																																																																																																																																			<input type="file">
+																																																																																																																																																																																																																																			<div id="error-file-0" class="error-message text-danger" ></div>
+																																																																																																																																																																																																																																			<input type="file">
+																																																																																																																																																																																																																																			<div id="error-file-1" class="error-message text-danger" ></div>
+																																																																																																																																																																																																																																			<input type="file">
+																																																																																																																																																																																																																																			<div id="error-file-2" class="error-message text-danger" ></div>
+																																																																																																																																																																																																																																			</div> #}
 
 
 			<button type="button" class="btn btn-primary next-step">
