@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress Bar with Subsections</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            margin: 20px auto;
+            width: 80%;
+        }
+
+        .progress-container::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background-color: #ccc;
+            z-index: 0;
+            transform: translateY(-50%);
+        }
+
+        .step {
+            position: relative;
+            z-index: 1;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .step.active {
+            background-color: #2e7d32;
+        }
+
+        .step.completed {
+            background-color: #2e7d32;
+            /* Vert pour l'étape terminée */
+        }
+
+        .step .check {
+            font-size: 18px;
+            /* Taille de la coche */
+            color: white;
+        }
+
+        .progress-bar {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 5px;
+            background-color: #2e7d32;
+            z-index: 0;
+            transform: translateY(-50%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            margin: 20px 0;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .buttons {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2e7d32;
+            color: white;
+            cursor: pointer;
+        }
+
+        .buttons button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div class="step" data-step="1">1</div>
+        <div class="step" data-step="2">2</div>
+        <div class="step" data-step="3">3</div>
+        <div class="step" data-step="4">4</div>
+        <div class="step" data-step="5">5</div>
+    </div>
+
+    <div id="sections">
+        <section class="section active" data-section="1">Étape 1 - Sous-section 1</section>
+        <section class="section" data-section="1.2">Étape 1 - Sous-section 2</section>
+        <section class="section" data-section="1.3">Étape 1 - Sous-section 3</section>
+        <section class="section" data-section="2">Étape 2 - Sous-section 1</section>
+        <section class="section" data-section="3">Étape 3 - Sous-section 1</section>
+        <section class="section" data-section="4">Étape 4 - Sous-section 1</section>
+        <section class="section" data-section="4.1">Étape 4 - Sous-section 1</section>
+        <section class="section" data-section="5">Étape 5 - Sous-section 1</section>
+        <section class="section" data-section="5.2">Étape 5 - Sous-section 2</section>
+    </div>
+
+    <div class="buttons">
+        <button id="prev-btn" disabled>Précédent</button>
+        <button id="next-btn">Suivant</button>
+    </div>
+
+    <script>
+        const steps = document.querySelectorAll('.step');
+        const sections = document.querySelectorAll('.section');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Total des sections
+        const totalSections = sections.length;
+        let currentSectionIndex = 0;
+
+        // Initialiser les données dynamiques pour les sous-sections
+        const stepSubSections = [];
+
+        // Calcul du nombre de sous-sections pour chaque étape
+        steps.forEach(step => {
+            const stepNumber = step.dataset.step; // Récupérer l'étape à partir de l'attribut data-step
+            const subsectionsForStep = [];
+
+            sections.forEach(section => {
+                const sectionStep = section.dataset.section.split('.')[0]; // Récupérer la partie avant le point de l'attribut data-section
+                if (sectionStep === stepNumber) {
+                    subsectionsForStep.push(section); // Ajouter les sous-sections pour cette étape
+                }
+            });
+
+            stepSubSections.push({ step: stepNumber, subSections: subsectionsForStep.length });
+        });
+
+        console.log(stepSubSections); // Affiche les étapes avec leur nombre de sous-sections
+
+        // Calcul de la largeur dynamique de chaque portion de la barre de progression
+        const totalSteps = stepSubSections.length - 1; // 3 portions pour 4 étapes
+        const stepWidth = 100 / totalSteps;  // Divise la barre en 3 portions égales
+
+        // Fonction pour calculer la progression dynamique
+        function updateProgressBar() {
+            let progress = 0;
+            let sectionsPassed = 0;
+
+            stepSubSections.forEach((stepData, stepIndex) => {
+                // Diviser chaque portion entre 2 étapes
+                const subSectionWidth = stepWidth / stepData.subSections; // Diviser l'étape en sous-sections
+
+                if (currentSectionIndex >= sectionsPassed && currentSectionIndex < sectionsPassed + stepData.subSections) {
+                    // Calculer la progression dans l'étape en fonction des sous-sections
+                    progress = (stepIndex * stepWidth) + (currentSectionIndex - sectionsPassed) * subSectionWidth;
+                }
+
+                sectionsPassed += stepData.subSections;  // Mettre à jour le compteur de sections passées
+            });
+
+            // Si la progression dépasse 100%, la limiter à 100%
+            progress = Math.min(progress, 100);
+
+            // Mise à jour de la barre de progression
+            progressBar.style.width = `${progress}%`;
+
+            // Mise à jour des étapes actives
+            steps.forEach((step, index) => {
+                const isActive = currentSectionIndex >= stepSubSections.slice(0, index).reduce((a, b) => a + b.subSections, 0) &&
+                    currentSectionIndex < stepSubSections.slice(0, index + 1).reduce((a, b) => a + b.subSections, 0);
+                step.classList.toggle('active', isActive);
+
+                // Lorsque l'étape est terminée, ajouter la classe completed
+                if (currentSectionIndex >= stepSubSections.slice(0, index + 1).reduce((a, b) => a + b.subSections, 0)) {
+                    step.classList.add('completed');
+                    step.innerHTML = '<span class="check">&#10003;</span>';  // Remplacer le numéro par une coche
+                } else {
+                    step.classList.remove('completed');
+                    step.innerHTML = index + 1;  // Restaurer le numéro
+                }
+            });
+        }
+
+        // Mise à jour des sections visibles
+        function updateSections() {
+            sections.forEach((section, index) => {
+                section.classList.toggle('active', index === currentSectionIndex);
+            });
+        }
+
+        // Mise à jour des boutons
+        function updateButtons() {
+            prevBtn.disabled = currentSectionIndex === 0;
+            nextBtn.disabled = currentSectionIndex === totalSections - 1;
+        }
+
+        // Écouteurs d'événements pour les boutons
+        nextBtn.addEventListener('click', () => {
+            if (currentSectionIndex < totalSections - 1) {
+                currentSectionIndex++;
+                updateProgressBar();
+                updateSections();
+                updateButtons();
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSectionIndex > 0) {
+                currentSectionIndex--;
+                updateProgressBar();
+                updateSections();
+                updateButtons();
+            }
+        });
+
+        // Initialisation
+        updateProgressBar();
+        updateSections();
+        updateButtons();
+    </script>
+
+
+</body>
+
+</html>
