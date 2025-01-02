@@ -14,7 +14,8 @@
 
         .progress-container {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: auto;
+            grid-auto-flow: column;
             align-items: center;
             position: relative;
             justify-items: center;
@@ -22,13 +23,9 @@
             width: 80%;
         }
 
-        .progress-container::before {
-            content: "";
+        .progress-bar-fix {
             position: absolute;
-            width: 80%;
             top: 35%;
-            left: 10%;
-            right: 0;
             height: 5px;
             background-color: #ccc;
             z-index: -2;
@@ -126,6 +123,7 @@
 
 <body>
     <div class="progress-container">
+        <div class="progress-bar-fix"></div>
         <div class="progress-bar" id="progress-bar"></div>
         <div class="progress-item">
             <div class="step" data-stepper-step="1">1</div>
@@ -148,6 +146,26 @@
             <div class="step" data-stepper-step="5">5</div>
             <div>Ville</div>
         </div>
+        <div class="progress-item">
+            <div class="step" data-stepper-step="6">6</div>
+            <div>Ville de naissance</div>
+        </div>
+        <div class="progress-item">
+            <div class="step" data-stepper-step="7">7</div>
+            <div>Ville de deces</div>
+        </div>
+        <div class="progress-item">
+            <div class="step" data-stepper-step="8">8</div>
+            <div>Ville de deces</div>
+        </div>
+        <div class="progress-item">
+            <div class="step" data-stepper-step="9">9</div>
+            <div>Ville de deces</div>
+        </div>
+        <div class="progress-item">
+            <div class="step" data-stepper-step="10">10</div>
+            <div>Ville de deces</div>
+        </div>
     </div>
 
     <div id="sections">
@@ -160,6 +178,8 @@
         <section class="section" data-step="4">Étape 4 - Sous-section 1</section>
         <section class="section" data-step="5">Étape 5 - Sous-section 1</section>
         <section class="section" data-step="5">Étape 5 - Sous-section 2</section>
+        <section class="section" data-step="6">Étape 6 - Sous-section 1</section>
+        <section class="section" data-step="7">Étape 7 - Sous-section 1</section>
     </div>
 
     <div class="buttons">
@@ -171,12 +191,36 @@
         $(document).ready(function () {
             const $steps = $(".step");
             const $sections = $(".section");
+            const $progressBarFix = $(".progress-bar-fix");
             const $progressBar = $("#progress-bar");
             const $prevBtn = $("#prev-btn");
             const $nextBtn = $("#next-btn");
 
             let currentSectionIndex = 0; // Index de la section actuelle
             const totalSections = $sections.length;
+
+            // Ajuste dynamiquement la largeur et la position de la barre fixe
+            function adjustProgressBarFix() {
+                const totalSteps = $steps.length;
+                const containerWidth = $(".progress-container").width();
+                const stepSpacing = containerWidth / totalSteps;
+
+                // Ajuste la largeur et la position de la barre fixe
+                $progressBarFix.css({
+                    width: `${(totalSteps - 1) * stepSpacing}px`,
+                    left: `${stepSpacing / 2}px`,
+                });
+
+                $progressBar.css({
+                    left: `${stepSpacing / 2}px`,
+                });
+            }
+
+            // Appeler lors du redimensionnement de la fenêtre pour rester réactif
+            $(window).resize(adjustProgressBarFix);
+
+            // Initialisation
+            adjustProgressBarFix();
 
             // Groupe les sections par étape
             const stepSections = [];
