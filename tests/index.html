@@ -14,8 +14,8 @@
 
         .progress-container {
             display: grid;
-            grid-template-columns: auto;
             grid-auto-flow: column;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             align-items: center;
             position: relative;
             justify-items: center;
