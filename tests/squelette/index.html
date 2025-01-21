@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Accessible</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<style>
+    /* Style par défaut pour tout type de focus */
+    button:focus {
+        outline: 2px solid blue !important;
+        /* Style visible pour tous */
+        outline-offset: 2px !important;
+    }
+
+    /* Style spécifique pour le focus visible via clavier ou assistance */
+    button:focus-visible {
+        outline: 3px solid orange !important;
+        /* Accentuation pour les utilisateurs au clavier */
+    }
+
+    /* Styles par défaut pour tous les champs input */
+    input {
+        font-size: 16px !important;
+        padding: 10px !important;
+        border: 2px solid #ccc !important;
+        /* Bordure grise */
+        border-radius: 5px !important;
+        background-color: #fff !important;
+        color: #333 !important;
+        /* Couleur du texte */
+        transition: all 0.3s ease-in-out !important;
+        /* Animation douce */
+        outline: none !important;
+        /* Désactive le contour bleu par défaut */
+    }
+
+    /* État au survol (hover) */
+    input:hover {
+        border-color: #007bff !important;
+        /* Bordure bleue */
+        background-color: #f9f9f9 !important;
+        /* Légère variation du fond */
+    }
+
+    /* État au focus (n'importe quel mode d'interaction) */
+    input:focus {
+        border-color: #0056b3 !important;
+        /* Bordure bleu foncé */
+        background-color: #eef6ff !important;
+        /* Fond bleu clair */
+        box-shadow: 0 0 5px rgba(0, 91, 187, 0.5) !important;
+        /* Halo bleu clair */
+    }
+
+    /* État focus-visible (uniquement clavier ou technologies d'assistance) */
+    input:focus-visible {
+        border-color: #ff8800 !important;
+        /* Bordure orange vif */
+        background-color: #fff7e6 !important;
+        /* Fond orange pâle */
+        box-shadow: 0 0 5px rgba(255, 136, 0, 0.5) !important;
+        /* Halo orange */
+    }
+
+    /* État actif (quand l'élément est cliqué ou en cours d'utilisation) */
+    input:active {
+        border-color: #ff0000 !important;
+        /* Bordure rouge */
+        background-color: #ffe6e6 !important;
+        /* Fond rouge pâle */
+        box-shadow: inset 0 0 3px rgba(255, 0, 0, 0.7) !important;
+        /* Effet enfoncé */
+    }
+
+    /* État désactivé */
+    input:disabled {
+        border-color: #e0e0e0 !important;
+        /* Bordure grise claire */
+        background-color: #f5f5f5 !important;
+        /* Fond gris clair */
+        color: #a0a0a0 !important;
+        /* Texte grisé */
+        cursor: not-allowed !important;
+        /* Indication visuelle d'inactivité */
+        opacity: 0.7 !important;
+        /* Légère transparence */
+    }
+</style>
+
+<body>
+    <div class="container mt-5">
+        <h1 id="form-title">Formulaire Accessible</h1>
+        <form aria-labelledby="form-title">
+            <fieldset>
+                <legend>Remplissez ce formulaire</legend>
+                <div class="mb-3">
+                    <label for="text-input" class="form-label">Votre nom</label>
+                    <input type="text" id="text-input" name="name" class="form-control" placeholder="Entrez votre nom"
+                        aria-required="true" required>
+                </div>
+                <!-- Champ de saisie -->
+                <div class="mb-3">
+                    <label for="text-input" class="form-label">
+                        Votre nom <span class="text-danger">*</span>
+                    </label>
+                    <input type="text" id="text-input" name="name" class="form-control" placeholder="Entrez votre nom"
+                        aria-required="true" required aria-describedby="name-description">
+                    <div id="name-description" class="form-text">
+                        Ce champ est obligatoire.
+                    </div>
+                </div>
+
+                <!-- Menu déroulant -->
+                <div class="mb-3">
+                    <label for="select-option" class="form-label">
+                        Choisissez une option <span class="text-danger">*</span>
+                    </label>
+                    <select id="select-option" name="options" class="form-select" aria-required="true" required
+                        aria-describedby="select-description">
+                        <option value="" disabled selected>Veuillez sélectionner une option</option>
+                        <option value="option1">Option 1</option>
+                        <option value="option2">Option 2</option>
+                        <option value="option3">Option 3</option>
+                    </select>
+                    <div id="select-description" class="form-text">
+                        Faites un choix parmi les options proposées.
+                    </div>
+                </div>
+
+                <!-- Groupe de boutons radio -->
+                <fieldset class="mb-3">
+                    <legend>
+                        Choisissez une préférence <span class="text-danger">*</span>
+                    </legend>
+                    <div id="preference-description" class="form-text">
+                        Sélectionnez l'une des options ci-dessous.
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="radio1" name="preference" value="option1" class="form-check-input"
+                            required aria-describedby="preference-description">
+                        <label for="radio1" class="form-check-label">Option A</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="radio2" name="preference" value="option2" class="form-check-input"
+                            aria-describedby="preference-description">
+                        <label for="radio2" class="form-check-label">Option B</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" id="radio3" name="preference" value="option3" class="form-check-input"
+                            aria-describedby="preference-description">
+                        <label for="radio3" class="form-check-label">Option C</label>
+                    </div>
+                </fieldset>
+
+                <!-- Cases à cocher -->
+                <fieldset class="mb-3">
+                    <legend>Acceptez nos conditions <span class="text-danger">*</span></legend>
+                    <div id="terms-description" class="form-text">
+                        Ces conditions sont nécessaires pour continuer.
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="checkbox1" name="terms" value="accept" class="form-check-input"
+                            required aria-describedby="terms-description">
+                        <label for="checkbox1" class="form-check-label">
+                            J'accepte les termes et conditions
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" id="checkbox2" name="newsletter" value="subscribe"
+                            class="form-check-input">
+                        <label for="checkbox2" class="form-check-label">
+                            Je veux m'inscrire à la newsletter
+                        </label>
+                    </div>
+                </fieldset>
+
+                <!-- Bouton de soumission -->
+                <button type="submit" class="btn btn-primary" aria-label="Soumettre le formulaire">
+                    Soumettre
+                </button>
+            </fieldset>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
