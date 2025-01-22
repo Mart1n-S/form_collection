@@ -4,225 +4,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulaire Accessible</title>
+    <title>Formulaire Étapes</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .invalid-feedback {
+            color: red;
+            font-size: 0.875em;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-<style>
-    /* Style par défaut pour tout type de focus */
-    button:focus {
-        outline: 2px solid blue !important;
-        /* Style visible pour tous */
-        outline-offset: 2px !important;
-    }
-
-    /* Style spécifique pour le focus visible via clavier ou assistance */
-    button:focus-visible {
-        outline: 3px solid orange !important;
-        /* Accentuation pour les utilisateurs au clavier */
-    }
-
-    /* Styles par défaut pour tous les champs input */
-    input {
-        font-size: 16px !important;
-        padding: 10px !important;
-        border: 2px solid #ccc !important;
-        /* Bordure grise */
-        border-radius: 5px !important;
-        background-color: #fff !important;
-        color: #333 !important;
-        /* Couleur du texte */
-        transition: all 0.3s ease-in-out !important;
-        /* Animation douce */
-        outline: none !important;
-        /* Désactive le contour bleu par défaut */
-    }
-
-    /* État au survol (hover) */
-    input:hover {
-        border-color: #007bff !important;
-        /* Bordure bleue */
-        background-color: #f9f9f9 !important;
-        /* Légère variation du fond */
-    }
-
-    /* État au focus (n'importe quel mode d'interaction) */
-    input:focus {
-        border-color: #0056b3 !important;
-        /* Bordure bleu foncé */
-        background-color: #eef6ff !important;
-        /* Fond bleu clair */
-        box-shadow: 0 0 5px rgba(0, 91, 187, 0.5) !important;
-        /* Halo bleu clair */
-    }
-
-    /* État focus-visible (uniquement clavier ou technologies d'assistance) */
-    input:focus-visible {
-        border-color: #ff8800 !important;
-        /* Bordure orange vif */
-        background-color: #fff7e6 !important;
-        /* Fond orange pâle */
-        box-shadow: 0 0 5px rgba(255, 136, 0, 0.5) !important;
-        /* Halo orange */
-    }
-
-    /* État actif (quand l'élément est cliqué ou en cours d'utilisation) */
-    input:active {
-        border-color: #ff0000 !important;
-        /* Bordure rouge */
-        background-color: #ffe6e6 !important;
-        /* Fond rouge pâle */
-        box-shadow: inset 0 0 3px rgba(255, 0, 0, 0.7) !important;
-        /* Effet enfoncé */
-    }
-
-    /* État désactivé */
-    input:disabled {
-        border-color: #e0e0e0 !important;
-        /* Bordure grise claire */
-        background-color: #f5f5f5 !important;
-        /* Fond gris clair */
-        color: #a0a0a0 !important;
-        /* Texte grisé */
-        cursor: not-allowed !important;
-        /* Indication visuelle d'inactivité */
-        opacity: 0.7 !important;
-        /* Légère transparence */
-    }
-</style>
 
 <body>
     <div class="container mt-5">
-        <h1 id="form-title">Formulaire Accessible</h1>
-        <form aria-labelledby="form-title">
-            <fieldset>
-                <legend>Remplissez ce formulaire</legend>
-                <div class="mb-3">
-                    <label for="text-input" class="form-label">Votre nom</label>
-                    <input type="text" id="text-input" name="name" class="form-control" placeholder="Entrez votre nom"
-                        aria-required="true" required>
-                </div>
-                <!-- Champ de saisie -->
-                <div class="mb-3">
-                    <label for="text-input" class="form-label">
-                        Votre nom <span class="text-danger">*</span>
-                    </label>
-                    <input type="text" id="text-input" name="name" class="form-control" placeholder="Entrez votre nom"
-                        aria-required="true" required aria-describedby="name-description">
-                    <div id="name-description" class="form-text">
-                        Ce champ est obligatoire.
+        <h1 id="form-title">Formulaire en Étapes</h1>
+        <form id="multi-step-form" aria-labelledby="form-title">
+            <!-- Étape 1 -->
+            <div class="step active" id="step-1" aria-labelledby="step-1-title">
+                <fieldset>
+                    <legend id="step-1-title">Étape 1 : Informations personnelles</legend>
+                    <div class="mb-3">
+                        <label for="name" class="form-label" id="name-label">Votre nom</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="Entrez votre nom"
+                            required aria-labelledby="name-label" aria-required="true" aria-invalid="false"
+                            data-help="votre nom">
                     </div>
-                </div>
-
-                <!-- Menu déroulant -->
-                <div class="mb-3">
-                    <label for="select-option" class="form-label">
-                        Choisissez une option <span class="text-danger">*</span>
-                    </label>
-                    <select id="select-option" name="options" class="form-select" aria-required="true" required
-                        aria-describedby="select-description">
-                        <option value="" disabled selected>Veuillez sélectionner une option</option>
-                        <option value="option1">Option 1</option>
-                        <option value="option2">Option 2</option>
-                        <option value="option3">Option 3</option>
-                    </select>
-                    <div id="select-description" class="form-text">
-                        Faites un choix parmi les options proposées.
+                    <div class="mb-3">
+                        <label for="email" class="form-label" id="email-label">Votre email</label>
+                        <input type="email" id="email" name="email" class="form-control"
+                            placeholder="Entrez votre email" required aria-labelledby="email-label" aria-required="true"
+                            aria-invalid="false" data-help="votre email">
                     </div>
-                </div>
-
-                <!-- Groupe de boutons radio -->
-                <fieldset class="mb-3">
-                    <legend>
-                        Choisissez une préférence <span class="text-danger">*</span>
-                    </legend>
-                    <div id="preference-description" class="form-text">
-                        Sélectionnez l'une des options ci-dessous.
-                    </div>
-                    <div class="form-check">
-                        <input type="radio" id="radio1" name="preference" value="option1" class="form-check-input"
-                            required aria-describedby="preference-description">
-                        <label for="radio1" class="form-check-label">Option A</label>
-                    </div>
-                    <div class="form-check">
-                        <input type="radio" id="radio2" name="preference" value="option2" class="form-check-input"
-                            aria-describedby="preference-description">
-                        <label for="radio2" class="form-check-label">Option B</label>
-                    </div>
-                    <div class="form-check">
-                        <input type="radio" id="radio3" name="preference" value="option3" class="form-check-input"
-                            aria-describedby="preference-description">
-                        <label for="radio3" class="form-check-label">Option C</label>
-                    </div>
+                    <button type="button" class="btn btn-primary next-btn" disabled
+                        aria-controls="step-2">Suivant</button>
                 </fieldset>
+            </div>
 
-                <!-- Cases à cocher -->
-                <fieldset class="mb-3">
-                    <legend>Acceptez nos conditions <span class="text-danger">*</span></legend>
-                    <div id="terms-description" class="form-text">
-                        Ces conditions sont nécessaires pour continuer.
+            <!-- Étape 2 -->
+            <div class="step" id="step-2" aria-labelledby="step-2-title">
+                <fieldset>
+                    <legend id="step-2-title">Étape 2 : Préférences</legend>
+                    <div class="mb-3">
+                        <label for="select-option" class="form-label" id="select-option-label">Choisissez une
+                            option</label>
+                        <select id="select-option" name="options" class="form-select" required
+                            aria-labelledby="select-option-label" aria-required="true" data-help="votre choix d'option">
+                            <option value="" disabled selected>Veuillez sélectionner une option</option>
+                            <option value="option1">Option 1</option>
+                            <option value="option2">Option 2</option>
+                            <option value="option3">Option 3</option>
+                        </select>
                     </div>
-                    <div class="form-check">
-                        <input type="checkbox" id="checkbox1" name="terms" value="accept" class="form-check-input"
-                            required aria-describedby="terms-description">
-                        <label for="checkbox1" class="form-check-label">
-                            J'accepte les termes et conditions
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input type="checkbox" id="checkbox2" name="newsletter" value="subscribe"
-                            class="form-check-input">
-                        <label for="checkbox2" class="form-check-label">
-                            Je veux m'inscrire à la newsletter
-                        </label>
-                    </div>
+
+                    <!-- Groupe de boutons radio -->
+                    <fieldset class="mb-3">
+                        <legend>Choisissez une préférence</legend>
+                        <div class="form-check">
+                            <input type="radio" id="radio1" name="preference" value="option1" class="form-check-input"
+                                required aria-labelledby="radio1-label" data-help="préférence A">
+                            <label for="radio1" class="form-check-label" id="radio1-label">Option A</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="radio2" name="preference" value="option2" class="form-check-input"
+                                aria-labelledby="radio2-label" data-help="préférence B">
+                            <label for="radio2" class="form-check-label" id="radio2-label">Option B</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="radio" id="radio3" name="preference" value="option3" class="form-check-input"
+                                aria-labelledby="radio3-label" data-help="préférence C">
+                            <label for="radio3" class="form-check-label" id="radio3-label">Option C</label>
+                        </div>
+                    </fieldset>
+
+                    <button type="button" class="btn btn-secondary prev-btn" aria-controls="step-1">Précédent</button>
+                    <button type="button" class="btn btn-primary next-btn" disabled
+                        aria-controls="step-3">Suivant</button>
                 </fieldset>
+            </div>
 
-                <!-- Bouton de soumission -->
-                <button type="submit" class="btn btn-primary" aria-label="Soumettre le formulaire">
-                    Soumettre
-                </button>
-            </fieldset>
+            <!-- Étape 3 -->
+            <div class="step" id="step-3" aria-labelledby="step-3-title">
+                <fieldset>
+                    <legend id="step-3-title">Étape 3 : Validation</legend>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" id="terms" name="terms" value="accept" class="form-check-input"
+                                aria-labelledby="terms-label" aria-required="true" aria-invalid="false"
+                                data-help="acceptation des termes">
+                            <label for="terms" class="form-check-label" id="terms-label">J'accepte les termes et
+                                conditions</label>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary prev-btn" aria-controls="step-2">Précédent</button>
+                    <button type="submit" class="btn btn-success" disabled
+                        aria-controls="success-message">Soumettre</button>
+                </fieldset>
+            </div>
         </form>
     </div>
-    <hr class="bg-danger w-100">
-    <div class="container">
-        <!-- Titre principal -->
-        <header class="row">
-            <div class="col-12">
-                <h1 class="text-center">Titre Principal</h1>
-            </div>
-        </header>
 
-        <!-- Section de contenu -->
-        <section class="row mt-4">
-            <!-- Colonne principale -->
-            <div class="col-lg-8 col-md-12">
-                <div class="content-box">
-                    <h2>Colonne principale</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam euismod urna sit amet urna
-                        cursus,
-                        nec fermentum orci volutpat.</p>
-                </div>
-            </div>
+    <script>
+        $(document).ready(function () {
+            let currentStep = 0;
+            const steps = $('.step');
 
-            <!-- Colonne latérale -->
-            <div class="col-lg-4 col-md-12">
-                <div class="sidebar-box">
-                    <h3>Colonne latérale</h3>
-                    <p>Integer vehicula orci sed felis sollicitudin, et ultrices purus placerat. Fusce vulputate dui
-                        euismod
-                        dui volutpat.</p>
-                </div>
-            </div>
-        </section>
+            // Affiche l'étape actuelle
+            function showStep(index) {
+                steps.removeClass('active').eq(index).addClass('active');
+                validateStep(); // Valider l'étape actuelle
+            }
 
-        <!-- Section footer -->
-        <footer class="row mt-4">
-            <div class="col-12">
-                <p class="text-center">&copy; 2025 Votre Site. Tous droits réservés.</p>
-            </div>
-        </footer>
-    </div>
+            // Valide les champs de l'étape actuelle
+            function validateStep() {
+                const currentFields = steps.eq(currentStep).find(':input[required]:visible');
+                let allValid = true;
+
+                currentFields.each(function () {
+                    const $this = $(this);
+                    const helpMessage = $this.data('help');
+                    const isValid = this.checkValidity();
+
+                    if (!$this.data('touched')) {
+                        return; // Ne rien faire pour les champs non touchés
+                    }
+
+                    if (!isValid) {
+                        $this.attr('aria-invalid', 'true');
+                        $this.addClass('is-invalid');
+
+                        if (!$this.next('.invalid-feedback').length) {
+                            const errorMessage = $this.val() === '' ?
+                                `Merci de renseigner ${helpMessage}` :
+                                `Veuillez vérifier ${helpMessage}`;
+                            $this.after(`<div class="invalid-feedback">${errorMessage}</div>`);
+                        }
+                        allValid = false;
+                    } else {
+                        $this.attr('aria-invalid', 'false');
+                        $this.removeClass('is-invalid');
+                        $this.next('.invalid-feedback').remove();
+                    }
+                });
+
+                steps.eq(currentStep).find('.next-btn, [type="submit"]').prop('disabled', !allValid);
+            }
+
+            // Ajoute un événement pour marquer un champ comme "touché"
+            $(':input[required]').on('keyup focusout', function () {
+                $(this).data('touched', true); // Marque le champ comme touché
+                validateStep(); // Valide à nouveau pour vérifier son état
+            });
+
+            // Bouton "Suivant"
+            $('.next-btn').click(function () {
+                if (currentStep < steps.length - 1) {
+                    currentStep++;
+                    showStep(currentStep);
+                }
+            });
+
+            // Bouton "Précédent"
+            $('.prev-btn').click(function () {
+                if (currentStep > 0) {
+                    currentStep--;
+                    showStep(currentStep);
+                }
+            });
+
+            // Initialisation : Ajout de `data-touched` aux champs requis
+            $(':input[required]').each(function () {
+                $(this).data('touched', false);
+            });
+
+            showStep(currentStep);
+        });
+
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
