@@ -2,15 +2,16 @@
 
 namespace App\Controller;
 
+use TonFormType;
 use App\Entity\Association;
 use App\Entity\DowloadToken;
+use Psr\Log\LoggerInterface;
 use App\Form\AssociationType;
 use Symfony\Component\Mime\Email;
+use App\Service\VerificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\AssociationRepository;
 use App\Repository\DowloadTokenRepository;
-use App\Service\VerificationService;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +25,33 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class AssociationController extends AbstractController
 {
     public function __construct(private VerificationService $checkEnvironment, private LoggerInterface $loggerInterface) {}
+
+    #[Route('/test', name: 'app_test')]
+    public function test(Request $request): Response
+    {
+        $form = $this->createForm(TonFormType::class);
+
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            dd($data);
+            // if ($request->request->get('preference') === 'option1') {
+            //     $matricule = $form->get('matricule')->getData();
+            //     // Traiter le matricule
+            // } else {
+            //     $numero = $form->get('numero')->getData();
+            //     // Traiter le numéro
+            // }
+
+            // Redirection ou traitement
+            return $this->redirectToRoute('app_success');
+        }
+
+        return $this->render('association/test.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
 
     #[Route('/association', name: 'app_association')]
     public function index(Request $request, EntityManagerInterface $entityManager, MailerInterface $mailer): Response

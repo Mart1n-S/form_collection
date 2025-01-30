@@ -67,21 +67,28 @@
             <div class="step active" id="step-1" aria-labelledby="step-1-title">
                 <fieldset>
                     <legend id="step-1-title">Étape 1 : Informations personnelles</legend>
+
                     <div class="mb-3">
-                        <label for="name" class="form-label" id="name-label">Votre nom</label>
+                        <label for="name" class="form-label">Votre nom</label>
                         <input type="text" id="name" name="name" class="form-control" placeholder="Entrez votre nom"
-                            required aria-labelledby="name-label" aria-required="true" aria-invalid="false"
-                            data-help="votre nom">
+                            required aria-describedby="name-help">
+                        <small id="name-help" class="form-text">Veuillez entrer votre nom.</small>
                     </div>
+
                     <div class="mb-3">
-                        <label for="email" class="form-label" id="email-label">Votre email</label>
+                        <label for="email" class="form-label">Votre email</label>
                         <input type="email" id="email" name="email" class="form-control"
-                            placeholder="Entrez votre email" required aria-labelledby="email-label" aria-required="true"
-                            aria-invalid="false" data-help="votre email">
+                            placeholder="Entrez votre email" required aria-describedby="email-help">
+                        <small id="email-help" class="form-text">Veuillez entrer une adresse e-mail valide.</small>
                     </div>
+
                     <button type="button" class="btn btn-primary next-btn" disabled
                         aria-controls="step-2">Suivant</button>
+
+                    <!-- Zone pour afficher des erreurs dynamiques -->
+                    <div id="error-message" aria-live="polite"></div>
                 </fieldset>
+
             </div>
 
             <!-- Étape 2 -->
@@ -106,19 +113,28 @@
                         <div class="form-check">
                             <input type="radio" id="radio1" name="preference" value="option1" class="form-check-input"
                                 required aria-labelledby="radio1-label" data-help="préférence A">
-                            <label for="radio1" class="form-check-label" id="radio1-label">Option A</label>
+                            <label for="radio1" class="form-check-label" id="radio1-label">Oui</label>
                         </div>
                         <div class="form-check">
                             <input type="radio" id="radio2" name="preference" value="option2" class="form-check-input"
                                 aria-labelledby="radio2-label" data-help="préférence B">
-                            <label for="radio2" class="form-check-label" id="radio2-label">Option B</label>
-                        </div>
-                        <div class="form-check">
-                            <input type="radio" id="radio3" name="preference" value="option3" class="form-check-input"
-                                aria-labelledby="radio3-label" data-help="préférence C">
-                            <label for="radio3" class="form-check-label" id="radio3-label">Option C</label>
+                            <label for="radio2" class="form-check-label" id="radio2-label">Non</label>
                         </div>
                     </fieldset>
+
+                    <div id="num">
+                        <label for="numero" class="form-label">Votre numéro</label>
+                        <input type="text" id="numero" name="numero" class="form-control"
+                            placeholder="Entrez votre numéro" aria-describedby="numero-help">
+                    </div>
+
+                    <div class="mb-3" id="mat">
+                        <label for="matricule" class="form-label">Votre matricule</label>
+                        <input type="email" id="matricule" name="matricule" class="form-control"
+                            placeholder="Entrez votre matricule" required aria-describedby="matricule-help">
+                        <small id="matricule-help" class="form-text">Veuillez entrer un matricule valide.</small>
+                    </div>
+
 
                     <button type="button" class="btn btn-secondary prev-btn" aria-controls="step-1">Précédent</button>
                     <button type="button" class="btn btn-primary next-btn" disabled
@@ -269,6 +285,32 @@
                 });
             });
         });
+
+
+        $(document).ready(function () {
+            function toggleFields() {
+                let isYesChecked = $('#radio1').is(':checked');
+
+                if (isYesChecked) {
+                    $('#matricule').closest('.mb-3').show().find('input').attr('required', 'required');
+                    $('#numero').closest('div').hide().find('input').removeAttr('required');
+                } else {
+                    $('#matricule').closest('.mb-3').hide().find('input').removeAttr('required');
+                    $('#numero').closest('div').show().find('input').attr('required', 'required');
+                }
+            }
+
+            // Exécuter au chargement pour prendre en compte la pré-sélection
+            toggleFields();
+
+            // Ajouter un événement sur les boutons radio
+            $('input[name="preference"]').on('change', toggleFields);
+        });
+
+
+
+
+
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+	{{ form_start(form) }}
+
+	<fieldset class="mb-3">
+		<legend>Choisissez une préférence</legend>
+		{{ form_row(form.preference) }}
+	</fieldset>
+
+	<div id="matricule-block" style="display: none;">
+		{{ form_label(form.matricule) }}
+		<!-- Génère le label -->
+		{{ form_widget(form.matricule)}}
+
+
+		<div class="invalid-feedback"></div>
+
+	</div>
+
+	<div id="numero-block" style="display: none;">
+		{{ form_row(form.numero) }}
+	</div>
+
+	<button type="submit" class="btn btn-primary">Valider</button>
+
+	{{ form_end(form) }}
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () {
+function toggleFields() {
+let isYesChecked = $('input[name="ton_form[preference]"]:checked').val() === "option1";
+
+console.log(isYesChecked);
+
+if (isYesChecked) { // Afficher le champ matricule et rendre le champ matricule obligatoire
+$('#matricule-block').show().find('input').attr('required', 'required').val('');
+// Vider le champ matricule
+// Cacher le champ numéro et enlever son attribut "required"
+$('#numero-block').hide().find('input').removeAttr('required').val(''); // Vider le champ numéro
+} else { // Afficher le champ numéro et rendre le champ numéro obligatoire
+$('#numero-block').show().find('input').attr('required', 'required').val('');
+// Vider le champ numéro
+// Cacher le champ matricule et enlever son attribut "required"
+$('#matricule-block').hide().find('input').removeAttr('required').val(''); // Vider le champ matricule
+}
+}
+
+toggleFields();
+$('input[name="ton_form[preference]"]').on('change', toggleFields);
+
+$('input').on('input', function () { // Vérifie la validité du champ modifié
+checkInputValidity($(this));
+});
+
+// Fonction pour vérifier la validité d'un input
+function checkInputValidity(input) { // Vérifier si l'input est valide
+const helpText = input.data('help');
+// Récupérer la valeur de data-help
+
+// Vérifier la validité
+if (input[0].checkValidity()) {
+input.removeClass('is-invalid').addClass('is-valid');
+console.log('is-valid');
+
+// Si valide, on vide le message d'erreur
+input.siblings('.invalid-feedback').text('');
+} else {
+input.removeClass('is-valid').addClass('is-invalid');
+console.log('is-invalid');
+
+// Si le champ est vide
+if (! input.val()) {
+input.siblings('.invalid-feedback').text (`Merci de renseigner ${helpText}.`);
+} else { // Si le champ est invalide (mais non vide)
+input.siblings('.invalid-feedback').text (`Veuillez vérifier ${helpText}.`);
+}
+}
+}
+});
+	</script>
+
+
+{% endblock %}
