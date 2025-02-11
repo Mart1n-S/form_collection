@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Test PDF</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+			}
+			h1 {
+				text-align: center;
+			}
+			.content {
+				margin-top: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Document PDF</h1>
+		<div class="content">
+			<p>
+				<strong>Nom :</strong>
+				{{ data.nom }}</p>
+			<p>
+				<strong>Numéro :</strong>
+				{{ data.num|split('', 2)|join('.') }}</p>
+
+		</div>
+	</body>
+</html>
