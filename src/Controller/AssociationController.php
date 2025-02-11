@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use TonFormType;
+use App\Entity\Category;
 use App\Entity\Association;
 use App\Entity\DowloadToken;
 use Psr\Log\LoggerInterface;
 use App\Form\AssociationType;
+use App\Form\OfferByCategoryType;
 use Symfony\Component\Mime\Email;
 use App\Service\VerificationService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,6 +51,28 @@ class AssociationController extends AbstractController
         }
 
         return $this->render('association/test.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/test2', name: 'app_test2')]
+    public function test2(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Récupère toutes les catégories
+        $categories = $entityManager->getRepository(Category::class)->findAll();
+
+        $form = $this->createForm(OfferByCategoryType::class, null, [
+            'categories' => $categories,
+        ]);
+
+        $form->handleRequest($request);
+        // dd($form);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            dd($data);
+        }
+
+        return $this->render('association/test2.html.twig', [
             'form' => $form->createView(),
         ]);
     }

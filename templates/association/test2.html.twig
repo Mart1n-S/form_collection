@@ -1,0 +1,60 @@
+{# templates/offer/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Offers by Category Grid
+{% endblock %}
+
+{% block body %}
+	<h1>Offers by Category Grid</h1>
+
+	{{ form_start(form) }}
+	<style>
+		.form-check-input {
+			margin-right: 10px; /* Espacement entre la checkbox et le label */
+		}
+
+		fieldset {
+			background-color: #f8f9fa; /* Couleur de fond pour les catégories */
+			border-radius: 8px; /* Bordures arrondies */
+		}
+
+		legend {
+			font-weight: bold; /* Texte en gras pour les légendes */
+		}
+	</style>
+	{%dump(form) %}
+	<div class="container">
+		<div
+			class="row">
+			{# Itérer sur chaque catégorie du formulaire #}
+			{% for categoryField in form %}
+				{# {%dump(categoryField) %} #}
+
+
+				<div class="col-md-6 mb-4">
+					<fieldset class="border p-3 h-100">
+						<legend class="w-auto px-2">{{ categoryField.vars.label }}</legend>
+						<div
+							class="row">
+							{# Itérer sur les offres de la catégorie et les afficher en grille (2 colonnes) #}
+							{% for offerField in categoryField %}
+								<div class="col-md-6 mb-2">
+									<div class="form-check">
+										{{ form_widget(offerField, {'attr': {'class': 'form-check-input'}}) }}
+										{{ form_label(offerField, null, {'label_attr': {'class': 'form-check-label'}}) }}
+									</div>
+								</div>
+							{% endfor %}
+						</div>
+					</fieldset>
+				</div>
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="text-center mt-4">
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</div>
+
+	{{ form_end(form) }}
+{% endblock %}
