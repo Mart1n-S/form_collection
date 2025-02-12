@@ -51,6 +51,10 @@ class AssociationController extends AbstractController
             // 4. Redirection après envoi
             return $this->redirectToRoute('app_success');
         }
+        // Ajouter un flash message en cas d'erreur
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('danger', 'Votre formulaire contient des erreurs.');
+        }
 
         return $this->render('association/test2.html.twig', [
             'form' => $form->createView(),

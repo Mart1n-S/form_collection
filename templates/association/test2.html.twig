@@ -3,6 +3,13 @@
 {% block body %}
 
 	{{ form_start(form) }}
+	{% for message in app.flashes('danger') %}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			{{ message }}
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	{% endfor %}
+
 
 	{{form_row(form.nom)}}
 	{{form_row(form.num)}}
@@ -13,7 +20,15 @@
 	{{ form_end(form) }}
 
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script>
+		$(document).ready(function () { // Ferme l'alerte après 5 secondes
+setTimeout(function () {
+$('.alert').fadeOut(500); // FadeOut pour disparaitre progressivement
+}, 5000);
 
+
+});
+	</script>
 	<script>
 		$(document).ready(function () {
 $(".date").on("change", function () {
