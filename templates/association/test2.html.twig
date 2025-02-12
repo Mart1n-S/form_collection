@@ -6,10 +6,47 @@
 
 	{{form_row(form.nom)}}
 	{{form_row(form.num)}}
+	{{form_row(form.date)}}
 
 	<button type="submit" class="btn btn-primary">Valider</button>
 
 	{{ form_end(form) }}
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+	<script>
+		$(document).ready(function () {
+$(".date").on("change", function () {
+let input = $(this);
+let dateValue = input.val();
+
+if (!isValidDate(dateValue)) {
+alert("Date invalide ! Vérifiez l'année bissextile.");
+input.val("");
+}
+});
+
+function isValidDate(dateStr) {
+let parts = dateStr.split("/");
+if (parts.length !== 3) 
+return false;
+
+
+
+let day = parseInt(parts[0], 10);
+let month = parseInt(parts[1], 10);
+let year = parseInt(parts[2], 10);
+
+if (isNaN(day) || isNaN(month) || isNaN(year)) 
+return false;
+
+
+
+// Vérifier si la date est correcte en tenant compte des années bissextiles
+return new Date(year, month - 1, day).getDate() === day;
+}
+});
+	</script>
 
 
 {% endblock %}
