@@ -1,0 +1,16 @@
+{% block _customer_form_offer_widget %}
+    <div class="form-group">
+        {% for group_label, choices in form.vars.choices %}
+            <div class="category-group">
+                <strong>{{ group_label }}</strong>
+                {% for choice in choices %}
+                    <div class="form-check">
+                        <input type="checkbox" id="{{ form.vars.id }}_{{ choice.value }}" name="{{ form.vars.full_name }}[]" value="{{ choice.value }}" {% if choice.value in form.vars.value %}checked="checked"{% endif %} class="form-check-input" />
+                        <label for="{{ form.vars.id }}_{{ choice.value }}" class="form-check-label">{{ choice.label }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        {{ form_errors(form) }}
+    </div>
+{% endblock %}

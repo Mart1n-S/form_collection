@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'customer/custom_form.html.twig' %}
+
+{% block title %}Formulaire Client{% endblock %}
+
+{% block body %}
+    <h1>Formulaire Client</h1>
+
+    {# Afficher les messages flash #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {# Afficher le formulaire #}
+    {{ form_start(form) }}
+        {{ form_row(form.firstname) }}
+        {{ form_row(form.lastname) }}
+        {{ form_row(form.offer) }}
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    {{ form_end(form) }}
+{% endblock %}
