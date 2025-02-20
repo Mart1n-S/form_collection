@@ -55,6 +55,27 @@
                 /* Retour à une colonne */
             }
         }
+
+
+        .rounded-top-custom {
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .rounded-bottom-custom {
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+        }
+
+        .btn-check:checked+.btn-custom {
+            background-color: #0a5c4f !important;
+            color: white !important;
+        }
+
+        .btn-check:focus+.btn-custom {
+            /* box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5); */
+            border: 2px solid pink !important;
+        }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -67,7 +88,25 @@
             <div class="step active" id="step-1" aria-labelledby="step-1-title">
                 <fieldset>
                     <legend id="step-1-title">Étape 1 : Informations personnelles</legend>
+                    <div class="mb-3">
+                        <div class="border border-dark rounded-4 overflow-hidden col-12 col-xl-3 col-lg-3">
+                            <div class="btn-group-vertical w-100" role="group" aria-label="Statut du véhicule">
+                                <input type="radio" class="btn-check" name="statut" id="immatriculee" autocomplete="off"
+                                    checked>
+                                <label for="immatriculee"
+                                    class="btn btn-custom text-black py-2 m-0 border-0 rounded-top-custom ">
+                                    Immatriculée
+                                </label>
 
+                                <input type="radio" class="btn-check" name="statut" id="nonImmatriculee"
+                                    autocomplete="off">
+                                <label for="nonImmatriculee"
+                                    class="btn btn-custom text-black py-2 m-0 border-0 rounded-bottom-custom ">
+                                    Non Immatriculée
+                                </label>
+                            </div>
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label for="name" class="form-label">Votre nom</label>
                         <input type="text" id="name" name="name" class="form-control" placeholder="Entrez votre nom"
