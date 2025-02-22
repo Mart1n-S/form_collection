@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
+use App\Entity\Association;
+use App\Form\AssociationFormType;
 use App\Form\CustomerFormType;
 use App\Model\CustomerFormModel;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,6 +41,30 @@ class CustomerController extends AbstractController
 
         // Afficher le formulaire dans le template Twig
         return $this->render('customer/form.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/form-customer2', name: 'app_customer_v2')]
+    public function testModel(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $association = new Association();
+        // Créer le formulaire
+        $form = $this->createForm(AssociationFormType::class, $association);
+
+        // Gérer la soumission du formulaire
+        $form->handleRequest($request);
+
+        // Vérifier si le formulaire est soumis et valide
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer les données du formulaire
+            $formData = $form->getData();
+
+            dd($formData);
+        }
+
+        // Afficher le formulaire dans le template Twig
+        return $this->render('customer/form2.html.twig', [
             'form' => $form->createView(),
         ]);
     }

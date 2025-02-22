@@ -1,0 +1,83 @@
+{% macro radioCard(field) %}
+	<div class="col">
+		<input type="radio" id="{{ field.vars.id }}" name="{{ field.vars.full_name }}" value="{{ field.vars.value }}" class="btn-check" autocomplete="off" role="radio" tabindex="0" aria-checked="{{ field.vars.checked ? 'true' : 'false' }}" aria-labelledby="{{ field.vars.id }}-label" {% if field.vars.checked %} checked="checked" {% endif %} {% for attrname, attrvalue in field.vars.attr %} {{ attrname }}="{{ attrvalue }}" {% endfor %}>
+
+		<label class="card text-center p-3 action-card" id="{{ field.vars.id }}-label" for="{{ field.vars.id }}" role="button" tabindex="0" aria-label="Choisir l’action : {{ field.vars.label }}">
+			<div class="icon-placeholder mb-2" aria-hidden="true">
+				<span class="icon">ICON</span>
+			</div>
+			<div class="card-body p-0">
+				<p class="card-text">{{ field.vars.label }}</p>
+			</div>
+		</label>
+	</div>
+{% endmacro %}
+
+{% import _self as formMacros %}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Formulaire Client
+{% endblock %}
+
+{% block body %}
+	<style>
+		.action-card {
+			border: 2px solid transparent;
+			border-radius: 10px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			height: 100%;
+		}
+
+		/* Surbrillance au focus clavier */
+		.btn-check:focus + .action-card {
+			border-color: #FD883D;
+			box-shadow: 0 0 10px rgba(253, 136, 61, 0.5);
+			background-color: rgba(253, 136, 61, 0.1);
+		}
+
+		/* Surbrillance lors de la sélection */
+		.btn-check:checked + .action-card {
+			border-color: #FD883D;
+			box-shadow: 0 0 10px rgba(253, 136, 61, 0.5);
+			background-color: rgba(253, 136, 61, 0.1);
+		}
+
+		.icon-placeholder {
+			width: 80px;
+			height: 80px;
+			background-color: #e9ecef;
+			border: 1px solid #ccc;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin: 0 auto;
+		}
+
+		.icon {
+			font-size: 1.5rem;
+			color: #040404;
+		}
+
+		.card-text {
+			margin-top: 10px;
+			font-weight: 500;
+			color: #040404;
+		}
+	</style>
+
+	<div class="container">
+		<h1>Formulaire Client</h1>
+
+		{{ form_start(form) }}
+		<div class="row row-cols-2 row-cols-md-4 g-3" role="radiogroup" aria-labelledby="action-group-label">
+			<h2 id="action-group-label" class="visually-hidden">Choisissez une action</h2>
+			{% do form.action.setRendered %}
+			{% for child in form.action %}
+				{{ formMacros.radioCard(child) }}
+			{% endfor %}
+		</div>
+		{{ form_end(form) }}
+	</div>
+{% endblock %}
