@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<h1>Formulaire Client</h1>
+	<style>
+		.list-group-item.active {
+			background-color: #FD883D;
+			color: white;
+			font-weight: bold;
+		}
+	</style>
+	{# Afficher les messages flash #}
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endfor %}
+
+	{# Afficher le formulaire #}
+	{{ form_start(form) }}
+	<div>
+		<div class="mb-3 has-validation">
+			{{ form_label(form.adresse) }}
+			{{ form_widget(form.adresse) }}
+			<div class="invalid-feedback">
+				{{ form_errors(form.adresse) }}
+			</div>
+			<ul id="address-suggestions" class="list-group"></ul>
+
+
+		</div>
+		<div class="mb-3 has-validation">
+			{{ form_row(form.ville) }}
+			<div class="invalid-feedback">
+				{{ form_errors(form.ville) }}
+			</div>
+		</div>
+
+		<div class="mb-3 has-validation">
+			{{ form_row(form.codePostal) }}
+			<div class="invalid-feedback">
+				{{ form_errors(form.codePostal) }}
+			</div>
+		</div>
+	</div>
+
+
+	<button type="submit" class="btn btn-primary">Enregistrer</button>
+	{{ form_end(form) }}
+{% endblock %}

@@ -1,6 +1,7 @@
 import "./bootstrap.js";
 // import "./collection.js";
 // import "./api.js";
+import "./api-access.js";
 
 /*
  * Welcome to your app's main JavaScript file!
