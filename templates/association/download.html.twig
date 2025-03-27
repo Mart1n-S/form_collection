@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{# {% extends 'base.html.twig' %}
 
 {% block title %}Téléchargement des fichiers
 {% endblock %}
@@ -50,6 +50,83 @@ if (fileList.children.length === 0) {
 fileSection.style.display = 'none'; // Masquer la section des fichiers
 closingMessage.style.display = 'block'; // Afficher le message de fermeture
 }
+});
+});
+});
+	</script>
+{% endblock %} #}
+
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Téléchargement des fichiers
+{% endblock %}
+
+{% block body %}
+	<h1>Téléchargement des fichiers</h1>
+
+	{% if downloadLink is defined %}
+		<p>
+			<a href="{{ downloadLink }}">Cliquez ici pour télécharger le fichier ZIP</a>
+		</p>
+	{% endif %}
+
+	{% if files is defined and files is not empty %}
+		<div id="file-section">
+			<h2>Fichiers disponibles :</h2>
+			<ul id="file-list">
+				{% for file in files %}
+					<li>
+						<a href="{{ path('association_download_file', { folder: folder, filename: file.name }) }}" class="file-link">
+							{{ file.name }}
+						</a>
+					</li>
+				{% endfor %}
+			</ul>
+		</div>
+	{% else %}
+		<p>Aucun fichier à télécharger.</p>
+	{% endif %}
+
+	<p id="closing-message" style="display: none;">Vous pouvez fermer la page.</p>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+	<script>
+		$(document).ready(function () {
+const $fileSection = $('#file-section');
+const $fileList = $('#file-list');
+const $closingMessage = $('#closing-message');
+
+$('.file-link').on('click', function (e) {
+e.preventDefault();
+
+const $link = $(this);
+const url = $link.attr('href');
+const fileName = $link.text().trim();
+
+fetch(url).then(response => {
+if (!response.ok) {
+throw new Error("Erreur lors du téléchargement");
+}
+return response.blob();
+}).then(blob => {
+const blobUrl = window.URL.createObjectURL(blob);
+const $tempLink = $('<a>').attr('href', blobUrl).attr('download', fileName).appendTo('body');
+
+$tempLink[0].click();
+$tempLink.remove();
+window.URL.revokeObjectURL(blobUrl);
+
+// Supprimer le lien de la liste
+$link.parent().remove();
+
+if ($fileList.children().length === 0) {
+$fileSection.hide();
+$closingMessage.show();
+}
+}).catch(error => {
+alert("Le fichier n’a pas pu être téléchargé.");
+console.error(error);
 });
 });
 });

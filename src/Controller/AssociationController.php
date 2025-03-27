@@ -60,7 +60,7 @@ class AssociationController extends AbstractController
             $zip = new \ZipArchive();
             $zipFileName = $uploadDirectory . '/documents.zip';
 
-            if ($zip->open($zipFileName, \ZipArchive::CREATE) === TRUE) {
+            if ($zip->open($zipFileName, \ZipArchive::CREATE) === false) {
 
                 foreach ($data->getMembres() as $membre) {
                     // Accéder aux documents de chaque membre
@@ -479,7 +479,7 @@ class AssociationController extends AbstractController
     // }
 
     // Methode 2 binary
-    #[Route('/association/file/download/{folder}/{filename}', name: 'association_download_file')]
+    // #[Route('/association/file/download/{folder}/{filename}', name: 'association_download_file')]
     public function downloadFileBinary(string $folder, string $filename, DowloadTokenRepository $dowloadTokenRepository): BinaryFileResponse
     {
 
@@ -514,6 +514,56 @@ class AssociationController extends AbstractController
             $dowloadTokenRepository,
             $downloadToken
         ) {
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            $remainingFiles = array_diff(scandir($uploadDirectory), ['.', '..']);
+            if (empty($remainingFiles)) {
+                rmdir($uploadDirectory);
+                $dowloadTokenRepository->remove($downloadToken, true);
+            }
+        });
+
+        return $response;
+    }
+
+
+    #[Route('/association/file/download/{folder}/{filename}', name: 'association_download_file')]
+    public function downloadFileAjax(
+        string $folder,
+        string $filename,
+        DowloadTokenRepository $dowloadTokenRepository
+    ): StreamedResponse {
+        $downloadToken = $dowloadTokenRepository->findOneBy(['folderPath' => $folder]);
+
+        if (!$downloadToken) {
+            throw $this->createNotFoundException('Token invalide.');
+        }
+
+        $uploadDirectory = $this->getParameter('uploads_directory') . '/' . $folder;
+        $filePath = $uploadDirectory . '/' . $filename;
+
+        if (!file_exists($filePath)) {
+            throw $this->createNotFoundException('Fichier non trouvé.');
+        }
+
+        $response = new StreamedResponse(function () use ($filePath) {
+            readfile($filePath);
+            flush();
+        });
+
+        $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+
+        $response->headers->set('Content-Type', $mimeType);
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            basename($filePath)
+        ));
+        $response->headers->set('Cache-Control', 'no-store');
+
+        // Nettoyage après envoi
+        register_shutdown_function(function () use ($filePath, $uploadDirectory, $dowloadTokenRepository, $downloadToken) {
             if (file_exists($filePath)) {
                 unlink($filePath);
             }
