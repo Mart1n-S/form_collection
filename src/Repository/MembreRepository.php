@@ -40,4 +40,16 @@ class MembreRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    // src/Repository/UserRepository.php
+
+    public function findOlderThan(\DateTimeInterface $date): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.createdAt < :date')
+            ->andWhere('u.isAnonymized = false') // Si tu as ce champ
+            ->setParameter('date', $date)
+            ->getQuery()
+            ->getResult();
+    }
 }
