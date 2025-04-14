@@ -25,4 +25,7 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
+    '@mart1n-s/designsystem' => [
+        'path' => './node_modules/@mart1n-s/designsystem/src/index.js',
+    ],
 ];

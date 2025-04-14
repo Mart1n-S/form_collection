@@ -1,5 +1,6 @@
 framework:
-    asset_mapper:
-        # The paths to make available to the asset mapper.
-        paths:
-            - assets/
+  asset_mapper:
+    # The paths to make available to the asset mapper.
+    paths:
+      - assets/
+      - node_modules/@mart1n-s/designsystem/

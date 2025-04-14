@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+
+	<h1>Formulaire Utilisateur</h1>
+
+	{% for message in app.flashes('success') %}
+		<div class="alert alert-success">
+			{{ message }}
+		</div>
+	{% endfor %}
+
+
+	{# Affichage du formulaire Symfony #}
+	{{ form_start(form) }}
+
+	{# Utilisation d'un Web Component ds-input pour le champ "name" #}
+	<label for="{{ form.nom.vars.id }}">{{ form.nom.vars.label}}</label>
+	<ds-input id="{{ form.nom.vars.id }}" name="{{ form.nom.vars.full_name }}" placeholder="Entrez votre nom"></ds-input>
+
+	{# Utilisation d'un Web Component ds-button pour le bouton #}
+	<ds-button type="submit">
+		Envoyer</ds-button>
+
+	<input type="hidden" name="{{ form._token.vars.full_name }}" value="{{ form._token.vars.value }}">
+
+	{{ form_end(form, {'render_rest': false}) }}
+
+
+{% endblock %}

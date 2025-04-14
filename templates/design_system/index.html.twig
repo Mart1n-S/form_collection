@@ -1,0 +1,108 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	{# <h1>Bouton Web Component sans framework</h1>
+																				<ds-button>Valider</ds-button>
+																				<ds-button variant="secondary">Annuler</ds-button>
+																				<ds-button type="submit">Envoyer</ds-button>
+																				<ds-button disabled>Non disponible</ds-button>
+																				<ds-button type="button" title="Cliquez pour confirmer" aria-label="Confirmer la commande" data-tracking-id="btn-confirm">
+																					Confirmer
+																				</ds-button>
+																				<ds-button>
+																					<span slot="icon-left">📝</span>
+																					Modifier
+																				</ds-button>
+																				<ds-button>
+																					Suivant
+																					<span slot="icon-right">➡️</span>
+																				</ds-button>
+																				<ds-button>
+																					<span slot="icon-left">🔄</span>
+																					Mettre à jour
+																					<span slot="icon-right">✔️</span>
+																				</ds-button>
+																			
+																				<ds-button id="myBtn">Envoyer</ds-button>
+																			
+																				<script>
+																					const btn = document.getElementById('myBtn');
+																			
+																			btn.addEventListener('click', () => {
+																			console.log('Bouton cliqué !');
+																			// Désactiver le bouton après le clic
+																			btn.setAttribute('disabled', '');
+																			});
+																				</script>
+																			
+																			
+																				<ds-button id="jqueryBtn">Valider</ds-button>
+																			
+																				<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+																				<script>
+																					setTimeout(() => {
+																			$('#jqueryBtn').attr('disabled', true);
+																			}, 1000);
+																				</script>
+																			
+																				<ds-input type="email" placeholder="Votre email" name="user_email" required aria-label="Champ email">
+																					<span slot="label">Adresse e-mail</span>
+																				</ds-input> #}
+	<section class="container">
+
+		<div>
+			<label for="firstname">Prénom</label>
+			<ds-input id="firstname" name="firstnaaaame" pattern="[A-Za-zÀ-ÖØ-öø-ÿ]+" placeholder="Entrez votre prénom" data-action="change"></ds-input>
+
+		</div>
+
+
+		<label for="lastname">Nom</label>
+		<ds-input id="lastname" name="lastname" placeholder="Entrez votre nom" required></ds-input>
+
+		<label for="email">Email</label>
+		<ds-input id="email" name="email" placeholder="Entrez votre email" disabled></ds-input>
+
+		<label for="username">Nom d'utilisateur</label>
+		<ds-input id="username" name="username" placeholder="Entrez votre nom d'utilisateur" icon="🔑"></ds-input>
+
+		<label for="password">Mot de passe</label>
+		<ds-input id="password" name="password" placeholder="Entrez votre mot de passe" helper-text="Au moins 8 caractères"></ds-input>
+
+		<label for="confirm-password">Confirmer le mot de passe</label>
+		<ds-input id="confirm-password" name="confirm-password" placeholder="Confirmez votre mot de passe" error helper-text="Les mots de passe ne correspondent pas"></ds-input>
+
+		<label for="address">Adresse</label>
+		<ds-input id="address" name="address" placeholder="Entrez votre adresse" value="123 Rue Exemple"></ds-input>
+
+		<form>
+			<label for="phone">Numéro de téléphone</label>
+			<ds-input id="phone" name="phone" placeholder="Entrez votre numéro de téléphone"></ds-input>
+			<button type="submit">Soumettre</button>
+		</form>
+
+		<label for="zipcode">Code postal</label>
+		<ds-input id="zipcode" name="zipcode" placeholder="Entrez votre code postal" data-custom="zipcode" aria-required="true"></ds-input>
+
+		<label for="user-email">Email</label>
+		<ds-input id="user-email" name="user-email" type="email" placeholder="Entrez votre email"></ds-input>
+
+		<label for="age">Âge</label>
+		<ds-input id="age" name="age" placeholder="Entrez votre âge" helper-text="L'âge doit être un nombre entier" error></ds-input>
+
+		<label for="custom">Personnalisé</label>
+		<ds-input id="custom" name="custom" placeholder="Entrez votre texte" style="--color-border: #007bff; --color-primary: #28a745;"></ds-input>
+
+		{# Créer un script qui au bout de 10 secondes rend disabled tous les input et mets un console.log #}
+		<script>
+
+			const input = document.querySelector('[data-action="change"]');
+
+input.addEventListener('input', (event) => {
+console.log('Input changed:', event.target.value);
+
+});
+		</script>
+
+	</section>
+{% endblock %}
