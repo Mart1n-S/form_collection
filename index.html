@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toast avec Progress Bar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+        crossorigin="anonymous"></script>
+
+    <style>
+        .toast-timer {
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.7);
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-bottom-left-radius: 0.25rem;
+            border-bottom-right-radius: 0.25rem;
+            animation: toastProgress 3s linear forwards;
+            animation-play-state: running;
+        }
+
+        .toast-timer.paused {
+            animation-play-state: paused;
+        }
+
+        @keyframes toastProgress {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button type="button" class="btn btn-primary" id="copyBtn">Copier</button>
+    <div id="textToCopy" class="mt-3">Voici le texte à copier.</div>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="copyToast" class="toast align-items-center text-bg-success border-0 position-relative" role="alert"
+            aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="d-flex">
+                <div class="toast-body">Texte copié avec succès !</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Fermer"></button>
+            </div>
+            <div class="toast-timer" id="toastTimer"></div>
+        </div>
+    </div>
+
+    <!-- <script>
+        const copyBtn = document.getElementById("copyBtn");
+        const textToCopy = document.getElementById("textToCopy");
+        const toastEl = document.getElementById("copyToast");
+        const toast = new bootstrap.Toast(toastEl);
+        const timer = document.getElementById("toastTimer");
+
+        const toastDuration = 3000;
+        let timeoutId;
+        let remaining = toastDuration;
+        let startTime;
+
+        function showToast() {
+            // Reset state
+            clearTimeout(timeoutId);
+            timer.classList.remove("paused");
+            timer.style.animation = "none";
+            timer.offsetHeight; // Force reflow
+            timer.style.animation = ""; // Re-enable animation
+            remaining = toastDuration;
+            toast.show();
+
+            startTime = Date.now();
+            timeoutId = setTimeout(() => {
+                toast.hide();
+            }, remaining);
+        }
+
+        function pauseTimer() {
+            clearTimeout(timeoutId);
+            remaining -= Date.now() - startTime;
+            timer.classList.add("paused");
+        }
+
+        function resumeTimer() {
+            startTime = Date.now();
+            timeoutId = setTimeout(() => {
+                toast.hide();
+            }, remaining);
+            timer.classList.remove("paused");
+        }
+
+        copyBtn.addEventListener("click", () => {
+            navigator.clipboard.writeText(textToCopy.innerText).then(() => {
+                showToast();
+            });
+        });
+
+        toastEl.addEventListener("mouseenter", pauseTimer);
+        toastEl.addEventListener("mouseleave", resumeTimer);
+    </script> -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const $copyBtn = $("#copyBtn");
+            const $textToCopy = $("#textToCopy");
+            const $toastEl = $("#copyToast");
+            const $timer = $("#toastTimer");
+
+            const toastDuration = 3000;
+            let timeoutId;
+            let remaining = toastDuration;
+            let startTime;
+
+            function showToast() {
+                // Reset state
+                clearTimeout(timeoutId);
+                $timer.removeClass("paused");
+                $timer.css("animation", "none");
+                $timer[0].offsetHeight; // Force reflow
+                $timer.css("animation", ""); // Re-enable animation
+                remaining = toastDuration;
+                $toastEl.toast("show");
+
+                startTime = Date.now();
+                timeoutId = setTimeout(function () {
+                    $toastEl.toast("hide");
+                }, remaining);
+            }
+
+            function pauseTimer() {
+                clearTimeout(timeoutId);
+                remaining -= Date.now() - startTime;
+                $timer.addClass("paused");
+            }
+
+            function resumeTimer() {
+                startTime = Date.now();
+                timeoutId = setTimeout(function () {
+                    $toastEl.toast("hide");
+                }, remaining);
+                $timer.removeClass("paused");
+            }
+
+            $copyBtn.on("click", function () {
+                navigator.clipboard.writeText($textToCopy.text()).then(function () {
+                    showToast();
+                });
+            });
+
+            $toastEl.on("mouseenter", pauseTimer);
+            $toastEl.on("mouseleave", resumeTimer);
+        });
+    </script>
+
+</body>
+
+</html>
