@@ -161,6 +161,77 @@
             $toastEl.on("mouseenter", pauseTimer);
             $toastEl.on("mouseleave", resumeTimer);
         });
+
+
+        // const toast = document.getElementById("copyToast");
+        //     const timerBar = document.getElementById("toastTimer");
+        //     const closeBtn = document.getElementById("close-toast");
+        //     const message = document.getElementById("messageToast");
+
+        //     let toastDuration = 5000;
+        //     let timeoutId, startTime, remaining = toastDuration;
+
+        //     function showToast() {
+        //         resetTimer();
+
+        //         message.textContent = "Template du mail client copié";
+        //         toast.classList.remove("opacity-0");
+        //         closeBtn.disabled = false;
+
+        //         startTime = Date.now();
+        //         timeoutId = setTimeout(hideToast, remaining);
+        //     }
+
+        //     function hideToast() {
+        //         toast.classList.add("opacity-0");
+        //         closeBtn.disabled = true;
+        //         message.textContent = "";
+        //     }
+
+        //     function resetTimer() {
+        //         clearTimeout(timeoutId);
+        //         timerBar.classList.remove("paused");
+        //         timerBar.style.animation = "none";
+        //         timerBar.offsetHeight; // force reflow
+        //         timerBar.style.animation = "";
+        //         remaining = toastDuration;
+        //     }
+
+        //     function pauseTimer() {
+        //         clearTimeout(timeoutId);
+        //         remaining -= Date.now() - startTime;
+        //         timerBar.classList.add("paused");
+        //     }
+
+        //     function resumeTimer() {
+        //         startTime = Date.now();
+        //         timeoutId = setTimeout(hideToast, remaining);
+        //         timerBar.classList.remove("paused");
+        //     }
+
+        //     // Gestion du clic sur le bouton "copier"
+        //     document.getElementById("btn-copy").addEventListener("click", () => {
+        //         const mailBody = document.getElementById("email-text");
+        //         navigator.clipboard.write([
+        //             new ClipboardItem({
+        //                 "text/html": new Blob([mailBody.outerHTML], { type: "text/html" })
+        //             })
+        //         ]).then(showToast);
+        //     });
+
+        //     // Événements sur le toast
+        //     toast.addEventListener("mouseenter", pauseTimer);
+        //     toast.addEventListener("mouseleave", resumeTimer);
+
+        //     // Événements sur le bouton de fermeture
+        //     closeBtn.addEventListener("click", hideToast);
+        //     closeBtn.addEventListener("focus", () => {
+        //         if (!toast.matches(":hover")) pauseTimer();
+        //     });
+        //     closeBtn.addEventListener("focusout", () => {
+        //         if (!toast.matches(":hover")) resumeTimer();
+        //     });
+
     </script>
 
 </body>
