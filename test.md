@@ -93,3 +93,26 @@ services:
     App\Service\Anonymizer\:
         resource: '../src/Service/Anonymizer/'
         tags: ['app.anonymizer']
+
+
+
+
+        L’adresse de votre association doit contenir uniquement des lettres, chiffres, espaces et ponctuations simples (exemples : virgule, apostrophe, tiret). Exemple : 12 rue des Lilas."
+
+
+
+new Regex([
+            'pattern' => '/^[a-zA-Z0-9._%+\-]{1,30}@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/',
+            'message' => 'Format invalide. Exemple : jane.doe@email.com.',
+        ]),
+
+
+
+
+'pattern' => '/^(?=.{6,120}$)[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/'
+
+new Regex([
+            'pattern' => '/^(?=.{6,120}$)[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/',
+            'message' => 'L’adresse email doit être valide et contenir entre 6 et 120 caractères.',
+        ]),
+
