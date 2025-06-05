@@ -106,6 +106,24 @@ new Regex([
             'message' => 'Format invalide. Exemple : jane.doe@email.com.',
         ]),
 
+$('.btn.btn-caap-primary.next').on('click', function () {
+    const isOtherMemberBtn = $(this).is('#button-other-member');
+    const presidentFound = isOtherMemberBtn ? checkPresident() : false;
+
+    // Si le bouton n'est PAS "autre membre" OU le président a été trouvé
+    if (!isOtherMemberBtn || presidentFound) {
+        // Vérifie les champs visibles
+        $('input:visible, textarea:visible, select:visible').each(function () {
+            checkInputValidity($(this));
+        });
+
+        // Focus sur le premier champ invalide
+        $('section.active').find('.is-invalid:visible').first().focus();
+
+        // Action finale
+        toggleButton($(this));
+    }
+});
 
 
 
