@@ -134,3 +134,40 @@ new Regex([
             'message' => 'L’adresse email doit être valide et contenir entre 6 et 120 caractères.',
         ]),
 
+function checkInputCheckableValidity(input) {
+    const emptyText = input.data('empty');
+    const isRadio = input.attr('type') === 'radio';
+    const isValid = input[0].checkValidity();
+
+    if (isValid) {
+        // ✅ Cas des radios
+        if (isRadio) {
+            $('input[type="radio"]').removeClass('is-invalid');
+        }
+
+        input
+            .attr('aria-invalid', false)
+            .closest('.radio-group')
+            .next('.invalid-feedback')
+            .removeClass('d-block')
+            .text('');
+    } else {
+        // ❌ Cas invalide
+
+        if (isRadio) {
+            input
+                .attr('aria-invalid', true)
+                .closest('.radio-group')
+                .next('.invalid-feedback')
+                .find('.error-message')
+                .text(emptyText);
+        } else {
+            // ✅ Pour les checkbox
+            input
+                .closest('.container-form-group')
+                .prevAll('.invalid-feedback')
+                .removeClass('d-block')
+                .text('');
+        }
+    }
+}
