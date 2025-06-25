@@ -262,3 +262,48 @@ public void showUser(HttpServletResponse response, PrintWriter out, String userI
         }
     }
 }
+
+
+
+
+try {
+    $constraints = $config->validationConstraints();
+    $token_parsed = $config->parser()->parse($token);
+
+    // Vérification explicite de la signature
+    $valid = $config->validator()->validate($token_parsed, ...$constraints);
+    if (!$valid) {
+        send_http_error(400, "Bad Request. Invalid JWT token.");
+        exit();
+    }
+
+    return $token_parsed->claims()->get('role');
+
+} catch (\Throwable $e) {
+    send_http_error(400, "Bad Request. Invalid JWT token.");
+    exit();
+}
+
+
+
+
+$config->validator()->assert($token_parsed, ...$constraints);
+
+
+
+
+try {
+    $token_parsed = $config->parser()->parse($token);
+    $constraints = $config->validationConstraints();
+
+    $config->validator()->assert($token_parsed, ...$constraints); // lève exception si invalide
+
+    return $token_parsed->claims()->get('role');
+
+} catch (\Lcobucci\JWT\Validation\RequiredConstraintsViolated $e) {
+    send_http_error(400, "Bad Request. Invalid JWT token.");
+    exit();
+} catch (\Throwable $e) {
+    send_http_error(400, "Bad Request. Token parsing error.");
+    exit();
+}
