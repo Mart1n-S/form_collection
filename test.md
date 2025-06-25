@@ -519,3 +519,27 @@ public String base64ToJson(@RequestBody String base64) throws IOException {
     
     return new ObjectMapper().writeValueAsString(user);
 }
+
+
+
+
+
+
+
+import java.io.ObjectInputFilter;
+
+// ...
+
+@PostMapping("/base64tojson")
+@ResponseBody
+public String base64ToJson(@RequestBody String base64) throws IOException, ClassNotFoundException {
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64.getDecoder().decode(base64));
+    ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+
+    // 🛡️ Appliquer un filtre de sécurité pour restreindre les classes autorisées
+    ObjectInputFilter filter = ObjectInputFilter.Config.createFilter("com.sysdream.unserialize.controllers.ConverterController$User;!*");
+    objectInputStream.setObjectInputFilter(filter);
+
+    User user = (User) objectInputStream.readObject();
+    return new ObjectMapper().writeValueAsString(user);
+}
