@@ -307,3 +307,51 @@ try {
     send_http_error(400, "Bad Request. Token parsing error.");
     exit();
 }
+
+
+
+
+function checkAuth($data) {
+    global $config;
+
+    if (!isset($data) || !isset($data->token) || $data->token === '') {
+        send_http_error(401, "Authentication is required.");
+        exit();
+    }
+
+    $token = $data->token;
+
+    // Vérifie la signature manuellement
+    if (!verifySignature($token, 'HS_This-Is-My_Very_V3RY_str0Ng-KEY_123')) {
+        send_http_error(400, "Bad Request. Invalid JWT signature.");
+        exit();
+    }
+
+    try {
+        $token_parsed = $config->parser()->parse($token);
+        $role = $token_parsed->claims()->get('role');
+        return $role;
+    } catch (\Throwable $e) {
+        send_http_error(400, "Bad Request. Invalid JWT format.");
+        exit();
+    }
+}
+
+
+
+
+function verifySignature(string $jwt, string $secret): bool {
+    $parts = explode('.', $jwt);
+    if (count($parts) !== 3) {
+        return false;
+    }
+
+    list($header, $payload, $signature) = $parts;
+
+    // Recalcul de la signature
+    $data = $header . '.' . $payload;
+    $expectedSignature = rtrim(strtr(base64_encode(hash_hmac('sha256', $data, $secret, true)), '+/', '-_'), '=');
+
+    // Comparaison sécurisée
+    return hash_equals($expectedSignature, $signature);
+}
