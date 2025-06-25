@@ -214,3 +214,51 @@ document.getElementById('myForm').addEventListener('submit', function(event) {
 });
 </script>
 
+
+
+
+
+public void homepage(PrintWriter out) throws IOException, SQLException {
+    out.println("<h1>User list</h1>");
+    out.println("<table><thead><tr><th>User</th><th></th></tr></thead><tbody>");
+
+    String sql = "SELECT id, name FROM users WHERE client_id = ?";
+    try (
+        Connection conn = DriverManager.getConnection(MyServlet.url);
+        PreparedStatement pstmt = conn.prepareStatement(sql)
+    ) {
+        pstmt.setInt(1, this.clientId);
+        ResultSet rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            out.println("<tr>");
+            out.println("<td>" + StringEscapeUtils.escapeHtml(rs.getString("name")) + "</td>");
+            out.println("<td><a href=\"/show/" + rs.getInt("id") + "\">Show</a></td>");
+            out.println("</tr>");
+        }
+    }
+
+    out.println("</tbody></table>");
+}
+
+
+
+public void showUser(HttpServletResponse response, PrintWriter out, String userId)
+        throws IOException, SQLException {
+    String sql = "SELECT id, name FROM users WHERE client_id = ? AND id = ?";
+
+    try (
+        Connection conn = DriverManager.getConnection(MyServlet.url);
+        PreparedStatement pstmt = conn.prepareStatement(sql)
+    ) {
+        pstmt.setInt(1, this.clientId);
+        pstmt.setInt(2, Integer.parseInt(userId)); // ⚠️ à protéger par try-catch si userId est non fiable
+
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            out.println("<h1>User: " + StringEscapeUtils.escapeHtml(rs.getString("name")) + "</h1>");
+        } else {
+            out.println("<p>User not found</p>");
+        }
+    }
+}
