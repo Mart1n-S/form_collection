@@ -543,3 +543,32 @@ public String base64ToJson(@RequestBody String base64) throws IOException, Class
     User user = (User) objectInputStream.readObject();
     return new ObjectMapper().writeValueAsString(user);
 }
+
+
+
+
+
+<dependencies>
+  <!-- JUnit : ancienne version 4.11 -> mise à jour vers 4.13.2 -->
+  <dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.13.2</version>
+    <scope>test</scope>
+  </dependency>
+
+  <!-- SnakeYAML : 1.14 est très vulnérable (RCE). Mise à jour vers 2.2 -->
+  <dependency>
+    <groupId>org.yaml</groupId>
+    <artifactId>snakeyaml</artifactId>
+    <version>2.2</version>
+  </dependency>
+
+  <!-- prime-jwt : 1.0.0 est vulnérable. La dernière version fiable est 1.3.0 (2020) 
+       ⚠️ pas beaucoup maintenu, à remplacer à terme par Nimbus JOSE + JWT si possible -->
+  <dependency>
+    <groupId>com.inversoft</groupId>
+    <artifactId>prime-jwt</artifactId>
+    <version>1.3.0</version>
+  </dependency>
+</dependencies>
