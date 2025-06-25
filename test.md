@@ -420,3 +420,91 @@ class DatabaseManager
         return '[NON DISPONIBLE AVEC BCRYPT]';
     }
 }
+
+
+
+package com.example.xxe.controllers;
+
+import com.example.xxe.data.Product;
+import com.example.xxe.repositories.ProductRepository;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+@Controller
+public class ProductController {
+
+    private final ProductRepository productRepository;
+
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @PostMapping("/api")
+    @ResponseBody
+    public String index(@RequestBody String xml) throws ParserConfigurationException, SAXException, IOException {
+        HashMap<String, List<Product>> response = new HashMap<>();
+        ArrayList<Product> searchRequest = parseXml(xml);
+
+        response.put("request", new ArrayList<>());
+        for (Product product : searchRequest) {
+            response.get("request").add(new Product(product.getName(), product.getPrice()));
+        }
+
+        response.put("searchResults", new ArrayList<>());
+        for (Product product : searchRequest) {
+            response.get("searchResults").addAll(productRepository.findByNameContaining(product.getName()));
+        }
+
+        XmlMapper mapper = new XmlMapper();
+        return mapper.writeValueAsString(response);
+    }
+
+    /**
+     * Méthode sécurisée pour parser du XML sans risque XXE.
+     */
+    private ArrayList<Product> parseXml(String body) throws ParserConfigurationException, IOException, SAXException {
+        ArrayList<Product> list = new ArrayList<>();
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        // 🔐 Sécurité anti-XXE
+        factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        factory.setXIncludeAware(false);
+        factory.setExpandEntityReferences(false);
+
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        ByteArrayInputStream input = new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8));
+        Document doc = builder.parse(input);
+
+        NodeList childNodes = doc.getDocumentElement().getElementsByTagName("product");
+
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node item = childNodes.item(i);
+            Product p = new Product();
+            p.setName(item.getTextContent());
+            list.add(p);
+        }
+
+        return list;
+    }
+}
