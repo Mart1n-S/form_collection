@@ -508,3 +508,14 @@ public class ProductController {
         return list;
     }
 }
+@PostMapping("/base64tojson")
+@ResponseBody
+public String base64ToJson(@RequestBody String base64) throws IOException {
+    byte[] jsonBytes = Base64.getDecoder().decode(base64);
+    String json = new String(jsonBytes, StandardCharsets.UTF_8);
+    
+    // Sécurisé : Jackson lit du JSON vers User
+    User user = new ObjectMapper().readValue(json, User.class);
+    
+    return new ObjectMapper().writeValueAsString(user);
+}
