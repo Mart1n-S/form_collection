@@ -355,3 +355,68 @@ function verifySignature(string $jwt, string $secret): bool {
     // Comparaison sécurisée
     return hash_equals($expectedSignature, $signature);
 }
+
+
+
+
+<?php
+
+class DatabaseManager
+{
+    private $databaseUrl = "sqlite:///tmp/db.sqlite";
+    private $pdo;
+
+    public function __construct()
+    {
+        try {
+            $this->pdo = new PDO($this->databaseUrl);
+        } catch (PDOException $e) {
+            die("Database connection error: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Crée un utilisateur avec un mot de passe hashé en bcrypt.
+     */
+    public function createUser($email, $password)
+    {
+        $query = $this->pdo->prepare("INSERT INTO users (email, password) VALUES (:email, :password)");
+        $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+        return $query->execute([
+            'email' => $email,
+            'password' => $hashedPassword
+        ]);
+    }
+
+    /**
+     * Tente de connecter un utilisateur via email et mot de passe.
+     */
+    public function login($email, $password)
+    {
+        $query = $this->pdo->prepare("SELECT password FROM users WHERE email = :email");
+        $query->execute(['email' => $email]);
+        $result = $query->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) {
+            return false;
+        }
+
+        return password_verify($password, $result['password']);
+    }
+
+    /**
+     * Vérifie un mot de passe en le comparant avec le hash stocké.
+     */
+    public function verifyPassword($password, $hash)
+    {
+        return password_verify($password, $hash);
+    }
+
+    /**
+     * Déhashage (inutilisable avec bcrypt) – conservé ici pour compatibilité.
+     */
+    public function decryptPassword($password_hash)
+    {
+        return '[NON DISPONIBLE AVEC BCRYPT]';
+    }
+}
