@@ -661,3 +661,57 @@ public String base64ToJson(@RequestBody String base64) throws IOException, Class
         </pluginManagement>
     </build>
 </project>
+
+
+
+
+async function inverserNumEtape(div_origine, div_cible, position) {
+  if (!div_cible) return;
+
+  const idOrigine = div_origine.dataset.pageid;
+  const idCible = div_cible.dataset.pageid;
+  const numEtapeOrigine = div_origine.dataset.pagenum;
+  const numEtapeCible = div_cible.dataset.pagenum;
+
+  const demo_id = ...; // à adapter : récupère l’ID de la démo depuis une variable globale ou un attribut HTML
+
+  try {
+    const response = await fetch(`/demo/creator/inverserOrdrePages/${demo_id}/${idOrigine}/${idCible}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP ${response.status}`);
+    }
+
+    const result = await response.json(); // si le backend renvoie un JSON, sinon supprime cette ligne
+
+    const previousDiv = document.querySelector("#divrow-etape-" + idOrigine);
+    const nextDiv = document.querySelector("#divrow-etape-" + idCible);
+
+    if (previousDiv) {
+      const deleteLink = previousDiv.querySelector("a.delete-etape");
+      if (deleteLink) {
+        deleteLink.href = `/demo/creator/${demo_id}/delete/${numEtapeCible}`;
+      }
+    }
+
+    if (nextDiv) {
+      const deleteLink = nextDiv.querySelector("a.delete-etape");
+      if (deleteLink) {
+        deleteLink.href = `/demo/creator/${demo_id}/delete/${numEtapeOrigine}`;
+      }
+    }
+
+    switchEtape(div_origine, div_cible, position);
+    resetArrows();
+    changeEtape("row-etape-" + idOrigine);
+
+  } catch (error) {
+    console.error("Erreur lors de l'inversion d'étape :", error);
+  }
+}
+
