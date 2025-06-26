@@ -715,3 +715,46 @@ async function inverserNumEtape(div_origine, div_cible, position) {
   }
 }
 
+function switchEtape(currentStep, targetStep, position) {
+    const tempPageNum = currentStep.dataset.pagenum;
+    const targetPageNum = targetStep.dataset.pagenum;
+
+    const getTextarea = pageNum =>
+        $(`textarea[id=modalCommentForm_etape_${pageNum}_contenu]`);
+
+    const currentComment = getTextarea(tempPageNum).text();
+    const targetComment = getTextarea(targetPageNum).text();
+
+    const findButtonByEtapeNum = etapeNum =>
+        buttons.flat().find(item => item.etapenum === etapeNum);
+
+    const currentBtn = findButtonByEtapeNum(tempPageNum);
+    const targetBtn = findButtonByEtapeNum(targetPageNum);
+
+    // Échange les commentaires
+    getTextarea(tempPageNum).text(targetComment);
+    getTextarea(targetPageNum).text(currentComment);
+
+    // Échange les numéros de page
+    [currentStep.dataset.pagenum, targetStep.dataset.pagenum] = [targetPageNum, tempPageNum];
+
+    // Mise à jour des images
+    const swapImgSrc = (source, target) => {
+        const tempSrc = $(source).attr("src");
+        $(source).attr("src", $(target).attr("src"));
+        $(target).attr("src", tempSrc);
+    };
+
+    swapImgSrc(currentStep.querySelector("img.card-img"),
+               targetStep.querySelector("img.card-img"));
+
+    // Mise à jour de l’affichage des numéros de page
+    currentBtn.etapenum = targetPageNum;
+    targetBtn.etapenum = tempPageNum;
+
+    currentStep.getElementsByClassName("pagesnum")[0].innerHTML = targetPageNum;
+    targetStep.getElementsByClassName("pagesnum")[0].innerHTML = tempPageNum;
+
+    // Réinsertion de l’élément déplacé
+    targetStep.insertAdjacentElement(position, currentStep);
+}
