@@ -780,4 +780,7 @@ const newSrcTarget = temp_pageImg.split('?')[0];
 $(targetStep).find("img.card-img").attr("src", `${newSrcTarget}?v=${Date.now()}`);
 
 
+$timestamp = time(); // ou microtime(true) ou uniqid() si tu préfères
+$numEtape = $page->getNumEtape();
+$htmlContent = "<img src=\"img/{$numEtape}.png?v={$timestamp}\" id=\"Screenshot\" class=\"Screenshot\">";
 
