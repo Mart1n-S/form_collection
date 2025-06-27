@@ -784,3 +784,32 @@ $timestamp = time(); // ou microtime(true) ou uniqid() si tu préfères
 $numEtape = $page->getNumEtape();
 $htmlContent = "<img src=\"img/{$numEtape}.png?v={$timestamp}\" id=\"Screenshot\" class=\"Screenshot\">";
 
+
+
+
+
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+
+// ...
+
+#[Route('/demo/view/{idDemo}', name: 'app_demo_view')]
+public function viewDemo($idDemo, DemoRepository $demoRepository): Response
+{
+    $filePath = $this->getParameter('demos_directory') . DIRECTORY_SEPARATOR . $idDemo . DIRECTORY_SEPARATOR . 'index.html';
+
+    if (!file_exists($filePath)) {
+        throw new FileNotFoundException("Le fichier HTML de la démo est introuvable.");
+    }
+
+    $htmlContent = file_get_contents($filePath);
+
+    return new Response($htmlContent, 200, [
+        'Content-Type' => 'text/html; charset=UTF-8',
+        'Cache-Control' => 'no-cache, no-store, must-revalidate',
+        'Pragma' => 'no-cache',
+        'Expires' => '0',
+    ]);
+}
+
