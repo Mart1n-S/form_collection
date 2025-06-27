@@ -773,6 +773,11 @@ $response->headers->set('Pragma', 'no-cache');
 $response->headers->set('Expires', '0');
 return $response;
 
+const newSrcCurrent = $(targetStep).find("img.card-img").attr("src").split('?')[0];
+$(currentStep).find("img.card-img").attr("src", `${newSrcCurrent}?v=${Date.now()}`);
+
+const newSrcTarget = temp_pageImg.split('?')[0];
+$(targetStep).find("img.card-img").attr("src", `${newSrcTarget}?v=${Date.now()}`);
 
 
 
