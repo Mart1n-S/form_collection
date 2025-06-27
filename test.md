@@ -852,3 +852,44 @@ app_demo_proxy:
 
 return new RedirectResponse("/demos/$idDemo/index.html?v=" . time());
 
+
+
+
+
+
+
+#[Route('/demos/{idDemo}/index.html', name: 'app_demo_view')]
+public function serveDemo(string $idDemo): Response
+{
+    // Génère ou lit le HTML à jour depuis var/demos/
+    $filePath = $this->getParameter('kernel.project_dir') . '/var/demos/' . $idDemo . '/index.html';
+
+    if (!file_exists($filePath)) {
+        throw $this->createNotFoundException("Demo introuvable.");
+    }
+
+    return new Response(file_get_contents($filePath), 200, [
+        'Content-Type' => 'text/html',
+        'Cache-Control' => 'no-store, no-cache, must-revalidate',
+    ]);
+}
+
+
+#[Route('/demo/{idDemo}', name: 'app_demo_export')]
+public function generateAndRedirect(string $idDemo): Response
+{
+    // Ici tu génères le fichier dans var/demos/{$idDemo}/index.html
+    $this->demoService->generateHtml($idDemo);
+
+    // Redirection vers route Symfony, pas un fichier statique
+    return $this->redirectToRoute('app_demo_view', ['idDemo' => $idDemo]);
+}
+
+
+
+
+
+
+
+
+
