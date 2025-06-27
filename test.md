@@ -950,3 +950,16 @@ return $this->redirectToRoute('app_demo_export', [
     'idDemo' => $idDemo,
     '_from_proxy' => true,
 ]);
+
+
+
+#[Route('/demos/{idDemo}/index.html', name: 'app_demo_proxy')]
+public function proxyDemoAccess(string $idDemo): Response
+{
+    // ✅ Redirige vers /demo/{idDemo} avec un flag pour ne pas reboucler
+    return $this->redirectToRoute('app_demo_export', [
+        'idDemo' => $idDemo,
+        '_from_proxy' => true,
+    ]);
+}
+
