@@ -890,6 +890,31 @@ public function generateAndRedirect(string $idDemo): Response
 
 
 
+// Route d’entrée utilisateur : déclenche l'export si besoin
+#[Route('/demo/{idDemo}', name: 'app_demo_export')]
+public function viewDemo($idDemo, DemoRepository $demoRepository, ModalRepository $modalRepository, BoutonRepository $boutonRepository, PageRepository $pageRepository, GestionExportDemos $gestionExportDemo): Response
+{
+    $currentDemo = $demoRepository->find($idDemo);
+
+    // Export vers /var/demos/...
+    $gestionExportDemo->exportDemo(
+        $currentDemo,
+        $this->getParameter('kernel.project_dir') . '/var/demos/' . $idDemo
+    );
+
+    // Redirection vers l'URL publique
+    return new RedirectResponse('/demos/' . $idDemo . '/index.html');
+}
+
+
+
+// Route technique, publique, mais qui redirige vers la bonne si appelée en direct
+#[Route('/demos/{idDemo}/index.html', name: 'app_demo_proxy')]
+public function proxyDemoAccess(string $idDemo): Response
+{
+    // Ne génère rien, redirige proprement
+    return $this->redirectToRoute('app_demo_export', ['idDemo' => $idDemo]);
+}
 
 
 
