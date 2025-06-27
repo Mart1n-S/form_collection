@@ -837,3 +837,18 @@ public function serveHtml(
     );
 }
 
+#[Route('/demos/{idDemo}/index.html', name: 'app_demo_proxy')]
+public function proxyDemoAccess(string $idDemo): Response
+{
+    // Forcer redirection vers /demo/{id} si accès direct
+    return $this->redirectToRoute('app_demo_export', ['idDemo' => $idDemo]);
+}
+
+
+app_demo_proxy:
+  path: /demos/{idDemo}/index.html
+  controller: App\Controller\DemoController::proxyDemoAccess
+  methods: [GET]
+
+return new RedirectResponse("/demos/$idDemo/index.html?v=" . time());
+
