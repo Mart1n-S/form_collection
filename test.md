@@ -813,3 +813,27 @@ public function viewDemo($idDemo, DemoRepository $demoRepository): Response
     ]);
 }
 
+
+
+
+
+#[Route('/demos/{idDemo}/index.html', name: 'app_demo_html')]
+public function serveHtml(
+    string $idDemo
+): Response {
+    $filePath = $this->getParameter('demos_directory') . DIRECTORY_SEPARATOR . $idDemo . DIRECTORY_SEPARATOR . 'index.html';
+
+    if (!file_exists($filePath)) {
+        throw $this->createNotFoundException("Fichier non trouvé");
+    }
+
+    return new Response(
+        file_get_contents($filePath),
+        200,
+        [
+            'Content-Type' => 'text/html',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate',
+        ]
+    );
+}
+
