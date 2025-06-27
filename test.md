@@ -918,3 +918,35 @@ public function proxyDemoAccess(string $idDemo): Response
 
 
 
+#[Route([
+    '/demo/{idDemo}',
+    '/demos/{idDemo}/index.html'
+], name: 'app_demo_export')]
+public function viewDemo(
+    $idDemo,
+    Request $request,
+    DemoRepository $demoRepository,
+    ModalRepository $modalRepository,
+    BoutonRepository $boutonRepository,
+    PageRepository $pageRepository,
+    GestionExportDemos $gestionExportDemo
+): Response {
+    $currentDemo = $demoRepository->find($idDemo);
+    $gestionExportDemo->exportDemo($currentDemo, $this->getParameter('kernel.project_dir') . '/var/demos/' . $idDemo);
+
+    // ✅ Ne redirige que si l'utilisateur ne vient pas déjà de /demos/{idDemo}/index.html
+    if (!$request->query->getBoolean('_from_proxy')) {
+        return new RedirectResponse('/demos/' . $idDemo . '/index.html');
+    }
+
+    // Sinon, retournez une réponse simple ou vide (car la redirection a déjà été faite)
+    return new Response(); // ou un message
+}
+
+
+
+
+return $this->redirectToRoute('app_demo_export', [
+    'idDemo' => $idDemo,
+    '_from_proxy' => true,
+]);
