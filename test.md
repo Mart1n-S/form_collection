@@ -963,3 +963,56 @@ public function proxyDemoAccess(string $idDemo): Response
     ]);
 }
 
+
+
+
+#[Route('/demos/{idDemo}/index.html', name: 'app_demo_proxy')]
+public function proxyDemoAccess(string $idDemo, Request $request): Response
+{
+    // Si déjà redirigé depuis ce contrôleur, ne pas reboucler
+    if ($request->query->get('_from_proxy')) {
+        throw $this->createNotFoundException("Redirection loop detected.");
+    }
+
+    // Sinon redirige vers /demo/{idDemo} avec un flag pour éviter la boucle
+    return $this->redirectToRoute('app_demo_export', [
+        'idDemo' => $idDemo,
+        '_from_proxy' => 1,
+    ]);
+}
+
+
+
+
+
+#[Route([
+    '/demo/{idDemo}',
+    '/demos/{idDemo}/index.html'
+], name: 'app_demo_export')]
+public function viewDemo(
+    string $idDemo,
+    DemoRepository $demoRepository,
+    GestionExportDemos $gestionExportDemo
+): Response {
+    $currentDemo = $demoRepository->find($idDemo);
+    if (!$currentDemo) {
+        throw $this->createNotFoundException("Démo introuvable.");
+    }
+
+    // Génère la démo dans /var/demos/{idDemo}
+    $demoDir = $this->getParameter('kernel.project_dir') . '/var/demos/' . $idDemo;
+    $gestionExportDemo->exportDemo($currentDemo, $demoDir);
+
+    // 🔁 Lire le contenu du fichier généré
+    $filePath = $demoDir . '/index.html';
+
+    if (!file_exists($filePath)) {
+        throw $this->createNotFoundException("Fichier index.html non trouvé.");
+    }
+
+    return new Response(
+        file_get_contents($filePath),
+        200,
+        ['Content-Type' => 'text/html']
+    );
+}
