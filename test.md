@@ -758,3 +758,21 @@ function switchEtape(currentStep, targetStep, position) {
     // Réinsertion de l’élément déplacé
     targetStep.insertAdjacentElement(position, currentStep);
 }
+
+
+
+
+
+
+use Symfony\Component\HttpFoundation\Response;
+
+// Avant le `return $this->render(...)`
+$response = $this->render('creation/creator.html.twig', [...]);
+$response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+$response->headers->set('Pragma', 'no-cache');
+$response->headers->set('Expires', '0');
+return $response;
+
+
+
+
