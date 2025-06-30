@@ -1016,3 +1016,55 @@ public function viewDemo(
         ['Content-Type' => 'text/html']
     );
 }
+
+
+
+
+
+
+
+function switchEtape(currentStep, targetStep, position) {
+    const tempPageNum = currentStep.dataset.pagenum;
+    const tempPageImg = currentStep.dataset.paging;
+    const targetPageNum = targetStep.dataset.pagenum;
+    const targetPageImg = targetStep.dataset.paging;
+
+    // Récupérer les commentaires
+    const currentComment = $(`#textarea[id=modalCommentForm_etape_${tempPageNum}_contenu]`).text();
+    const targetComment = $(`#textarea[id=modalCommentForm_etape_${targetPageNum}_contenu]`).text();
+
+    // Mise à jour des commentaires dans les bons textareas
+    $(`#textarea[id=modalCommentForm_etape_${tempPageNum}_contenu]`).text(targetComment);
+    $(`#textarea[id=modalCommentForm_etape_${targetPageNum}_contenu]`).text(currentComment);
+
+    // Mise à jour des boutons
+    const currentBtn = buttons.flat().find(item => item.etapenum == tempPageNum);
+    const targetBtn = buttons.flat().find(item => item.etapenum == targetPageNum);
+
+    // Échange des attributs
+    currentStep.dataset.pagenum = targetPageNum;
+    currentStep.dataset.paging = targetPageImg;
+    targetStep.dataset.pagenum = tempPageNum;
+    targetStep.dataset.paging = tempPageImg;
+
+    // Échange des images avec "cache buster" via Date.now()
+    const currentImgElem = $(currentStep).find("img.card-img");
+    const targetImgElem = $(targetStep).find("img.card-img");
+
+    const currentSrc = targetImgElem.attr("src").split("?")[0];
+    const targetSrc = currentImgElem.attr("src").split("?")[0];
+
+    currentImgElem.attr("src", `${currentSrc}?v=${Date.now()}`);
+    targetImgElem.attr("src", `${targetSrc}?v=${Date.now()}`);
+
+    // Mise à jour des numéros visibles
+    currentStep.getElementsByClassName("pagesNum")[0].innerHTML = targetPageNum;
+    targetStep.getElementsByClassName("pagesNum")[0].innerHTML = tempPageNum;
+
+    // Mise à jour des objets boutons
+    currentBtn.etapenum = targetPageNum;
+    targetBtn.etapenum = tempPageNum;
+
+    // Réinsertion des éléments dans le DOM
+    targetStep.insertAdjacentElement(position, currentStep);
+}
