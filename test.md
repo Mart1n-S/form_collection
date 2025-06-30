@@ -1068,3 +1068,19 @@ function switchEtape(currentStep, targetStep, position) {
     // Réinsertion des éléments dans le DOM
     targetStep.insertAdjacentElement(position, currentStep);
 }
+
+
+
+
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+#[Route('/some-path', name: 'some_route')]
+public function index(Security $security): Response
+{
+    if ($security->isGranted('ROLE_ADMIN') || $security->isGranted('ROLE_SUPER_ADMIN')) {
+        throw new AccessDeniedException('Accès refusé aux administrateurs.');
+    }
+
+    // Suite du code...
+}
+
