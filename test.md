@@ -1167,3 +1167,40 @@ public function findOneByIdAndSameCRForAdmin(int $demoId, User $admin): ?Demo
         ->getOneOrNullResult();
 }
 
+
+
+
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Security\Core\Security;
+
+class YourController extends AbstractController
+{
+    private Security $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+
+    /**
+     * Lève une exception si l'utilisateur a l'un des rôles interdits.
+     *
+     * @param string[] $deniedRoles Liste des rôles à interdire (ex: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'])
+     */
+    public function denyAccessIfHasRole(array $deniedRoles): void
+    {
+        $user = $this->security->getUser();
+
+        if (!$user) {
+            throw new AccessDeniedException('Utilisateur non connecté.');
+        }
+
+        $userRoles = $user->getRoles();
+
+        if (!empty(array_intersect($userRoles, $deniedRoles))) {
+            throw new AccessDeniedException('Accès interdit pour ce rôle.');
+        }
+    }
+}
+
