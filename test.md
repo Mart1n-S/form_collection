@@ -1084,3 +1084,34 @@ public function index(Security $security): Response
     // Suite du code...
 }
 
+
+
+
+
+
+
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Asset\Packages;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+
+class DemoType extends AbstractType
+{
+    private Packages $assets;
+
+    public function __construct(Packages $assets)
+    {
+        $this->assets = $assets;
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $imgUrl = $this->assets->getUrl('img/logo.png');
+
+        $builder->add('champ', TextType::class, [
+            'label' => '<img src="' . $imgUrl . '" alt="logo">',
+            'label_html' => true,
+        ]);
+    }
+}
+
