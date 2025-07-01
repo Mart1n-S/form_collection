@@ -1,4 +1,4 @@
-// src/Service/Anonymizer/AnonymizableInterface.php
+8// src/Service/Anonymizer/AnonymizableInterface.php
 
 namespace App\Service\Anonymizer;
 
@@ -1138,4 +1138,17 @@ switch (true) {
         // Aucun rôle connu
         break;
 }
+
+
+
+
+
+
+$qb = $repo->createQueryBuilder('e')
+    ->where('e.user = :user')
+    ->andWhere('JSON_CONTAINS(e.user.roles, :role) = 1')
+    ->setParameter('user', $user)
+    ->setParameter('role', '"ROLE_ADMIN"') // ⚠️ avec guillemets car JSON
+    ->getQuery()
+    ->getOneOrNullResult();
 
