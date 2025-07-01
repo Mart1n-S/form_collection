@@ -1115,3 +1115,27 @@ class DemoType extends AbstractType
     }
 }
 
+
+
+
+
+$roles = $user->getRoles();
+
+switch (true) {
+    case in_array('ROLE_ADMIN', $roles, true):
+        // Code pour admin
+        break;
+
+    case in_array('ROLE_CREATION', $roles, true):
+        // Code pour création
+        break;
+
+    case in_array('ROLE_USER', $roles, true):
+        // Code pour user
+        break;
+
+    default:
+        // Aucun rôle connu
+        break;
+}
+
