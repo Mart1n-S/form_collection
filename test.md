@@ -1152,3 +1152,18 @@ $qb = $repo->createQueryBuilder('e')
     ->getQuery()
     ->getOneOrNullResult();
 
+
+
+
+public function findOneByIdAndSameCRForAdmin(int $demoId, User $admin): ?Demo
+{
+    return $this->createQueryBuilder('d')
+        ->join('d.user', 'u')
+        ->where('d.id = :demoId')
+        ->andWhere('u.caisseRegionale = :cr')
+        ->setParameter('demoId', $demoId)
+        ->setParameter('cr', $admin->getCaisseRegionale())
+        ->getQuery()
+        ->getOneOrNullResult();
+}
+
