@@ -1233,3 +1233,28 @@ public function findOneByIdAndSameCRForAdmin(int $demoId, User $admin, bool $fil
         ->getQuery()
         ->getOneOrNullResult();
 }
+
+
+
+
+
+
+public function findOneByIdAndSameCRForAdmin(int $demoId, User $admin, bool $filterCommunautaire = false): ?Demo
+{
+    $qb = $this->createQueryBuilder('d')
+        ->join('d.user', 'u')
+        ->andWhere('d.id = :demoId')
+        ->setParameter('demoId', $demoId);
+
+    if ($filterCommunautaire) {
+        // Soit même CR, soit communautaire = true
+        $qb->andWhere('u.caisseRegionale = :cr OR d.communautaire = true')
+           ->setParameter('cr', $admin->getCaisseRegionale());
+    } else {
+        // Seulement si même CR
+        $qb->andWhere('u.caisseRegionale = :cr')
+           ->setParameter('cr', $admin->getCaisseRegionale());
+    }
+
+    return $qb->getQuery()->getOneOrNullResult();
+}
