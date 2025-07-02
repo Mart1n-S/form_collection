@@ -1204,3 +1204,32 @@ class YourController extends AbstractController
     }
 }
 
+
+
+
+
+
+
+/**
+ * Récupère une démo si :
+ * - l'utilisateur est admin ou super admin
+ * - et la démo appartient à un user de la même CR
+ * - si $param est true : filtre aussi sur communautaire = true
+ */
+public function findOneByIdAndSameCRForAdmin(int $demoId, User $admin, bool $filterCommunautaire = false): ?Demo
+{
+    $qb = $this->createQueryBuilder('d')
+        ->join('d.user', 'u')
+        ->andWhere('d.id = :demoId')
+        ->andWhere('u.caisseRegionale = :cr')
+        ->setParameter('demoId', $demoId)
+        ->setParameter('cr', $admin->getCaisseRegionale());
+
+    if ($filterCommunautaire) {
+        $qb->andWhere('d.communautaire = true');
+    }
+
+    return $qb
+        ->getQuery()
+        ->getOneOrNullResult();
+}
