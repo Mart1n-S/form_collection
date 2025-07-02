@@ -1258,3 +1258,19 @@ public function findOneByIdAndSameCRForAdmin(int $demoId, User $admin, bool $fil
 
     return $qb->getQuery()->getOneOrNullResult();
 }
+
+
+
+
+public function findUserInSameCR($matricule, $admin)
+{
+    return $this->createQueryBuilder('u')
+        ->andWhere('u.matricule = :matricule')
+        ->andWhere('u.caisseRegionale = :cr')
+        ->andWhere('u.roles NOT LIKE :excludedRole')
+        ->setParameter('matricule', $matricule)
+        ->setParameter('cr', $admin->getCaisseRegionale())
+        ->setParameter('excludedRole', '%ROLE_SUPER_ADMIN%')
+        ->getQuery()
+        ->getOneOrNullResult();
+}
