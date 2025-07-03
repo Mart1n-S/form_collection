@@ -1274,3 +1274,19 @@ public function findUserInSameCR($matricule, $admin)
         ->getQuery()
         ->getOneOrNullResult();
 }
+
+
+
+
+
+{% set isSameUser = usrInfos.getMatricule == user.getMatricule %}
+{% set isSuperAdmin = usrInfos.getNomRole == 'Super Admin' %}
+{% set targetIsSuperAdmin = user.getNomRole == 'Super Admin' %}
+
+{% if (not isSameUser) and (not targetIsSuperAdmin or (isSuperAdmin and not isSameUser)) %}
+    <a data-bs-toggle="modal" data-bs-target="#deleteUserModal_{{ user.matricule }}">
+        <img title="Supprimer cet utilisateur"
+             src="{{ asset('assets/img/icons/close.svg') }}"
+             class="icon">
+    </a>
+{% endif %}
