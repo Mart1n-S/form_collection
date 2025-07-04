@@ -1290,3 +1290,43 @@ public function findUserInSameCR($matricule, $admin)
              class="icon">
     </a>
 {% endif %}
+
+
+
+
+
+
+
+
+$(this)
+  .attr('aria-haspopup', 'true')
+  .attr('aria-expanded', 'false')
+  .attr('aria-controls', 'popover-' + popoverActiveId); // ID unique pour lier le contenu
+
+
+content: `
+  <div id="popover-${popoverActiveId}" role="dialog" aria-label="Filtre de recherche">
+    <input type="text" class="form-control field col-12 mb-2 popoverField" 
+           placeholder="Rechercher" name="searchString" />
+    <a onclick="$('#${popoverActiveId}').popover('hide');"
+       class="btn btn-cancel pointer">Annuler</a>
+    <button type="button" name="searchForString" class="btn btn-caap">Trier</button>
+  </div>
+`,
+
+
+$(this).on('shown.bs.popover', function () {
+  $(this).attr('aria-expanded', 'true');
+});
+
+$(this).on('hidden.bs.popover', function () {
+  $(this).attr('aria-expanded', 'false');
+});
+
+
+$(this).on('shown.bs.popover', function () {
+  const id = $(this).attr('id');
+  setTimeout(() => {
+    $(`#popover-${id} input[type="text"]`).trigger('focus');
+  }, 10);
+});
