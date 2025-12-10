@@ -1,0 +1,53 @@
+// Configuration des types de contrats
+const contractConfigs = {
+    CDI: {
+        selector: 'input[data-contract="CDI"]',
+        section: '#work_situation_CDI_CDD',
+        extraInfo: '#more_info_situation',
+        temporarySelector: 'input[data-contract="CDD"]',
+        temporarySection: '#is_temporary_job'
+    },
+    "Professionnel ou agricole": {
+        selector: 'input[data-contract="Professionnel ou agricole"]',
+        section: '#work_situation_AGRI',
+        extraInfo: '#more_info_situation'
+    },
+    "Autre": {
+        selector: 'input[data-contract="Autre"]',
+        section: '#work_situation_OTHER',
+        extraInfo: '#more_info_situation'
+    }
+};
+
+// Fonction générique
+function toggleWorkSituation(config) {
+    const isChecked = $(config.selector).is(':checked');
+
+    if (isChecked) {
+        $(config.section).removeClass('d-none');
+        if (config.extraInfo) $(config.extraInfo).removeClass('d-none');
+
+        // Cas particulier CDI/CDD → job temporaire
+        if (config.temporarySelector) {
+            if ($(config.temporarySelector).is(':checked')) {
+                $(config.temporarySection).removeClass('d-none');
+            } else {
+                $(config.temporarySection).addClass('d-none');
+                clearDiv($(config.temporarySection));
+            }
+        }
+
+    } else {
+        $(config.section).addClass('d-none');
+        clearDiv($(config.section));
+    }
+}
+
+
+// Listener principal
+$("input[name='housing_project_form[customer][contractType]']").on("change", function () {
+    $('#work_situation_details').removeClass('d-none');
+
+    // Pour chaque configuration, on déclenche le traitement
+    Object.values(contractConfigs).forEach(cfg => toggleWorkSituation(cfg));
+});
