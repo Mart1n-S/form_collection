@@ -1,131 +1,128 @@
-// Configuration des types de contrats
-const contractConfigs = {
-    CDI: {
-        selector: 'input[data-contract="CDI"]',
-        section: '#work_situation_CDI_CDD',
-        extraInfo: '#more_info_situation',
-        temporarySelector: 'input[data-contract="CDD"]',
-        temporarySection: '#is_temporary_job'
-    },
-    "Professionnel ou agricole": {
-        selector: 'input[data-contract="Professionnel ou agricole"]',
-        section: '#work_situation_AGRI',
-        extraInfo: '#more_info_situation'
-    },
-    "Autre": {
-        selector: 'input[data-contract="Autre"]',
-        section: '#work_situation_OTHER',
-        extraInfo: '#more_info_situation'
+src/
+ └─ Form/
+     └─ Cleaner/
+         ├─ MainFormCleanerInterface.php
+         ├─ ParcoursACleaner.php
+         ├─ ParcoursBCleaner.php
+         ├─ ParcoursCCleaner.php
+         └─ ...
+
+
+
+namespace App\Form\Cleaner;
+
+interface MainFormCleanerInterface
+{
+    /**
+     * Retourne TRUE si ce cleaner doit s'appliquer à ce parcours.
+     */
+    public function supports(array $data): bool;
+
+    /**
+     * Modifie les données envoyées par l’utilisateur.
+     */
+    public function clean(array &$data): void;
+}
+
+
+
+namespace App\Form\Cleaner;
+
+class ParcoursACleaner implements MainFormCleanerInterface
+{
+    public function supports(array $data): bool
+    {
+        return ($data['parcours'] ?? null) === 'A';
     }
-};
 
-// Fonction générique
-function toggleWorkSituation(config) {
-    const isChecked = $(config.selector).is(':checked');
+    public function clean(array &$data): void
+    {
+        // On supprime des champs non pertinents
+        unset($data['champX']);
+        unset($data['champY']);
 
-    if (isChecked) {
-        $(config.section).removeClass('d-none');
-        if (config.extraInfo) $(config.extraInfo).removeClass('d-none');
-
-        // Cas particulier CDI/CDD → job temporaire
-        if (config.temporarySelector) {
-            if ($(config.temporarySelector).is(':checked')) {
-                $(config.temporarySection).removeClass('d-none');
-            } else {
-                $(config.temporarySection).addClass('d-none');
-                clearDiv($(config.temporarySection));
-            }
+        // Et on peut faire des règles conditionnelles internes
+        if (($data['option_speciale'] ?? null) === 'non') {
+            unset($data['champPartage']);
         }
-
-    } else {
-        $(config.section).addClass('d-none');
-        clearDiv($(config.section));
     }
 }
 
 
-// Listener principal
-$("input[name='housing_project_form[customer][contractType]']").on("change", function () {
-    $('#work_situation_details').removeClass('d-none');
+services:
+    App\Form\Cleaner\:
+        resource: '../src/Form/Cleaner'
+        tags: ['app.form_cleaner']
 
-    // Pour chaque configuration, on déclenche le traitement
-    Object.values(contractConfigs).forEach(cfg => toggleWorkSituation(cfg));
-});
+class MainFormSubscriber implements EventSubscriberInterface
+{
+    private iterable $cleaners;
 
-
-
-
-
-
-
-
-
-
-
-######
-
-
-// Configuration des types de contrats
-const contractConfigs = {
-    CDI_CDD: {
-        selectors: ['input[data-contract="CDI"]', 'input[data-contract="CDD"]'],
-        section: '#work_situation_CDI_CDD',
-        showExtraInfo: true,
-        temporarySelector: 'input[data-contract="CDD"]',     // Afficher job temporaire si CDD
-        temporarySection: '#is_temporary_job'
-    },
-    AGRI: {
-        selectors: ['input[data-contract="Professionnel ou agricole"]'],
-        section: '#work_situation_AGRI',
-        showExtraInfo: true
-    },
-    OTHER: {
-        selectors: ['input[data-contract="Autre"]'],
-        section: '#work_situation_OTHER',
-        showExtraInfo: false // ← ICI : extra info doit être caché
+    public function __construct(iterable $cleaners)
+    {
+        $this->cleaners = $cleaners;
     }
-};
 
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            FormEvents::PRE_SUBMIT => 'onPreSubmit',
+        ];
+    }
 
-// Fonction générique
-function toggleWorkSituation(config) {
+    public function onPreSubmit(FormEvent $event): void
+    {
+        $data = $event->getData();
 
-    // Vérifie si au moins un des inputs associés est coché
-    const isChecked = config.selectors.some(sel => $(sel).is(':checked'));
-
-    if (isChecked) {
-        $(config.section).removeClass('d-none');
-
-        // Gérer l'affichage de more_info_situation
-        if (config.showExtraInfo) {
-            $('#more_info_situation').removeClass('d-none');
-        } else {
-            $('#more_info_situation').addClass('d-none');
-        }
-
-        // Cas particulier CDI/CDD → job temporaire
-        if (config.temporarySelector) {
-            if ($(config.temporarySelector).is(':checked')) {
-                $(config.temporarySection).removeClass('d-none');
-            } else {
-                $(config.temporarySection).addClass('d-none');
-                clearDiv($(config.temporarySection));
+        foreach ($this->cleaners as $cleaner) {
+            if ($cleaner->supports($data)) {
+                $cleaner->clean($data);
             }
         }
 
-    } else {
-        $(config.section).addClass('d-none');
-        clearDiv($(config.section));
+        $event->setData($data);
     }
 }
 
 
-// Listener principal
-$("input[name='housing_project_form[customer][contractType]']").on("change", function () {
-    $('#work_situation_details').removeClass('d-none');
 
-    Object.values(contractConfigs).forEach(cfg => toggleWorkSituation(cfg));
-});
+class MainFormType extends AbstractType
+{
+    private iterable $cleaners;
+
+    public function __construct(iterable $cleaners)
+    {
+        $this->cleaners = $cleaners;
+    }
+
+
+services:
+    App\Form\MainFormType:
+        arguments:
+            $cleaners: !tagged_iterator app.form_cleaner
+
+    App\Form\Cleaner\:
+        resource: '../src/Form/Cleaner'
+        tags: ['app.form_cleaner']
+
+public function buildForm(FormBuilderInterface $builder, array $options)
+{
+    $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+        $data = $event->getData();
+
+        // Appel automatique des cleaners
+        foreach ($this->cleaners as $cleaner) {
+            if ($cleaner->supports($data)) {
+                $cleaner->clean($data);
+            }
+        }
+
+        $event->setData($data);
+    });
+}
+
+
+
 
 
 
