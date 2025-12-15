@@ -1,4 +1,4 @@
-src/
+8src/
  └─ Form/
      └─ Cleaner/
          ├─ MainFormCleanerInterface.php
@@ -205,3 +205,22 @@ public function clean(array &$data, FormInterface $form): void
     // ...
 }
 
+
+
+
+foreach ($fieldsAddress as $parent => $children) {
+    if (!array_key_exists($parent, $data) || !is_array($data[$parent])) {
+        continue;
+    }
+
+    foreach ($children as $child) {
+        if (array_key_exists($child, $data[$parent])) {
+            unset($data[$parent][$child]);
+        }
+    }
+
+    // ⚠️ optionnel : si le sous-tableau devient vide
+    if ($data[$parent] === []) {
+        unset($data[$parent]);
+    }
+}
