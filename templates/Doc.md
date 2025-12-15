@@ -189,4 +189,19 @@ services:
 App\Form\MainFormType:
     arguments:
         $cleaners: !tagged_iterator app.form_cleaner
+/**
+ * Nettoie les données du formulaire avant le mapping et la validation.
+ *
+ * - Modifie directement le tableau $data (passé par référence)
+ * - Met à null ou vide les champs non pertinents selon le contexte métier
+ * - Ne retourne rien
+ * - Ne gère PAS la validation ni la configuration du formulaire
+ *
+ * @param array<string, mixed> $data Données soumises par l'utilisateur (PRE_SUBMIT)
+ * @param FormInterface       $form Instance du formulaire courant
+ */
+public function clean(array &$data, FormInterface $form): void
+{
+    // ...
+}
 
