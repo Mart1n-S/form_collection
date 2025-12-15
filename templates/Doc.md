@@ -224,3 +224,68 @@ foreach ($fieldsAddress as $parent => $children) {
         unset($data[$parent]);
     }
 }
+
+
+
+
+$fieldsAddress = [
+    'customer' => [
+        'address',
+        'addressBis',
+        'zipCode',
+        'city',
+    ],
+    'secondBorrow' => [
+        'address',
+        'addressBis',
+        'zipCode',
+        'city',
+    ],
+];
+
+foreach ($fieldsAddress as $parentKey => $children) {
+
+    // sécurité : le parent doit exister dans le form ET dans les data
+    if (
+        !$form->has($parentKey)
+        || !isset($data[$parentKey])
+        || !is_array($data[$parentKey])
+    ) {
+        continue;
+    }
+
+    $parentForm = $form->get($parentKey);
+
+    foreach ($children as $child) {
+
+        // sécurité : le champ doit exister dans le form
+        if (!$parentForm->has($child)) {
+            continue;
+        }
+
+        // récupération propre de la config existante
+        $config  = $parentForm->get($child)->getConfig();
+        $options = $config->getOptions();
+
+        // tu neutralises les contraintes (comme dans ta version)
+        $options['constraints'] = [];
+        $options['required']    = false;
+
+        // re-add du champ (même logique que toi)
+        $parentForm->add(
+            $child,
+            get_class($config->getType()->getInnerType()),
+            $options
+        );
+
+        // suppression de la donnée envoyée
+        if (array_key_exists($child, $data[$parentKey])) {
+            unset($data[$parentKey][$child]);
+        }
+    }
+
+    // optionnel : si le sous-tableau est vide
+    if ($data[$parentKey] === []) {
+        unset($data[$parentKey]);
+    }
+}
