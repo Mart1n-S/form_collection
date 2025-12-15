@@ -123,7 +123,70 @@ public function buildForm(FormBuilderInterface $builder, array $options)
 
 
 
+####
 
+class MainFormType extends AbstractType
+{
+    public function __construct(
+        private iterable $cleaners
+    ) {}
 
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
 
+            foreach ($this->cleaners as $cleaner) {
+                if ($cleaner->supports($data, $form)) {
+                    $cleaner->clean($data, $form);
+                }
+            }
+
+            $event->setData($data);
+        });
+    }
+}
+
+use Symfony\Component\Form\FormInterface;
+
+interface MainFormCleanerInterface
+{
+    public function supports(array $data, FormInterface $form): bool;
+
+    public function clean(array &$data, FormInterface $form): void;
+}
+
+class PersonalInformationCleaner implements MainFormCleanerInterface
+{
+    public function __construct(
+        private CountryRepository $countryRepository
+    ) {}
+
+    public function supports(array $data, FormInterface $form): bool
+    {
+        return true; // toujours applicable
+    }
+
+    public function clean(array &$data, FormInterface $form): void
+    {
+        if (
+            array_key_exists('country', $data)
+            && $this->countryRepository->find($data['country'])?->getCode() !== 'FR'
+        ) {
+            if ($form->has('department')) {
+                $data['department'] = null;
+            }
+        }
+    }
+}
+
+services:
+    App\Form\Cleaner\:
+        resource: '../src/Form/Cleaner'
+        tags: ['app.form_cleaner']
+
+App\Form\MainFormType:
+    arguments:
+        $cleaners: !tagged_iterator app.form_cleaner
 
