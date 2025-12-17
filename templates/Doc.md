@@ -1,4 +1,4 @@
-private function removeConstraints(FormInterface $form, array $fields, array &$data): void
+8private function removeConstraints(FormInterface $form, array $fields, array &$data): void
 {
     foreach ($fields as $field) {
         if (!$form->has($field)) {
@@ -235,3 +235,10 @@ $(document).ready(function () {
 
 });
 
+/**
+ * Observe la section `.loans-charges` pour détecter l'ajout de la classe `skip`.
+ * Quand l'étape est skippée, on réinitialise la collection des prêts
+ * (suppression des items en trop + reset des boutons).
+ *
+ * Utilise un MutationObserver car la classe est ajoutée dynamiquement.
+ */
