@@ -179,3 +179,29 @@ function resetLoansCollectionOnSkip(loansFieldsContainer) {
     }
 }
 
+
+
+function resetLoansCollectionOnSkip($loansFieldsContainer) {
+    const $items = $loansFieldsContainer.find('.loan-item');
+
+    // On garde le premier, on supprime les autres
+    for (let i = $items.length - 1; i >= 1; i--) {
+        const $item = $items.eq(i);
+        const $button = $item.find('[data-action="remove"]');
+
+        if ($button.length) {
+            toggleButtonResetOrDelete($button);
+        }
+
+        $item.remove();
+    }
+
+    // Remet le bouton du dernier item au bon état
+    const $remainingItem = $loansFieldsContainer.find('.loan-item').first();
+    if ($remainingItem.length) {
+        const $button = $remainingItem.find('[data-action="remove"]');
+        if ($button.length) {
+            toggleButtonResetOrDelete($button);
+        }
+    }
+}
