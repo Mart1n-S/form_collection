@@ -94,3 +94,54 @@ $rules = [
 $key = $rules[$customerContractTypeCode] ?? $rules['default'];
 
 $this->removeConstraints($customerForm, $key['remove'], $data);
+
+
+
+final class CleanContext
+{
+    public function __construct(
+        public readonly array $data,
+        public readonly ?FormInterface $form = null,
+        public readonly ?string $contractType = null,
+        public readonly bool $isProAgri = false,
+    ) {}
+}
+
+
+
+interface CleanerInterface
+{
+    public function clean(CleanContext $context): void;
+}
+
+class SimpleCleaner implements CleanerInterface
+{
+    public function clean(CleanContext $context): void
+    {
+        // utilise seulement data
+        $data = $context->data;
+    }
+}
+
+
+class ContractCleaner implements CleanerInterface
+{
+    public function clean(CleanContext $context): void
+    {
+        if ($context->contractType === 'CDI') {
+            // ...
+        }
+    }
+}
+
+
+$context = new CleanContext(
+    data: $data,
+    form: $form,
+    contractType: $contractType,
+    isProAgri: $isProAgri
+);
+
+foreach ($cleaners as $cleaner) {
+    $cleaner->clean($context);
+}
