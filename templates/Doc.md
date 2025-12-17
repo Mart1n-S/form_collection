@@ -205,3 +205,33 @@ function resetLoansCollectionOnSkip($loansFieldsContainer) {
         }
     }
 }
+
+
+$(document).ready(function () {
+
+    const target = document.querySelector('section.loans-charges');
+
+    if (!target) {
+        return;
+    }
+
+    const observer = new MutationObserver(function (mutations) {
+        mutations.forEach(function (mutation) {
+
+            if (
+                mutation.type === 'attributes'
+                && mutation.attributeName === 'class'
+                && target.classList.contains('skip')
+            ) {
+                resetLoansCollectionOnSkip($(target));
+            }
+        });
+    });
+
+    observer.observe(target, {
+        attributes: true,
+        attributeFilter: ['class'],
+    });
+
+});
+
