@@ -145,3 +145,37 @@ $context = new CleanContext(
 foreach ($cleaners as $cleaner) {
     $cleaner->clean($context);
 }
+
+
+
+function resetLoansCollectionOnSkip(loansFieldsContainer) {
+    const items = loansFieldsContainer.querySelectorAll('.loan-item');
+
+    // Tant qu'il y a plus d'un item → on supprime
+    while (items.length > 1) {
+        const lastItem = loansFieldsContainer.querySelector('.loan-item:last-child');
+
+        if (!lastItem) {
+            break;
+        }
+
+        const button = lastItem.querySelector('[data-action="remove"]');
+
+        // sécurité
+        if (button) {
+            toggleButtonResetOrDelete(button);
+        }
+
+        lastItem.remove();
+    }
+
+    // À la fin, on s'assure que le dernier bouton est en mode "reset"
+    const remainingItem = loansFieldsContainer.querySelector('.loan-item');
+    if (remainingItem) {
+        const button = remainingItem.querySelector('[data-action="remove"]');
+        if (button) {
+            toggleButtonResetOrDelete(button);
+        }
+    }
+}
+
