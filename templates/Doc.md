@@ -1,3 +1,35 @@
+function openModalIfHasErrors() {
+    const modalEl = document.getElementById('consultant_modal');
+    if (!modalEl) return;
+
+    // Erreur Symfony dans la modal ?
+    const hasErrors = modalEl.querySelector('.invalid-feedback');
+
+    if (hasErrors) {
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+        modal.show();
+    }
+}
+
+
+function initForm() {
+    let $section = stepWithFirstError();
+
+    if ($section) {
+        $section.removeClass("d-none");
+    } else {
+        $('.piafs').removeClass('d-none');
+    }
+
+    $('.home-page').addClass('d-none');
+    $('#container-stepper').removeClass('d-none');
+
+    // 🔥 Ouvre la modal si une erreur s'y trouve
+    openModalIfHasErrors();
+}
+
+
+
 if (input.name && !input.name.endsWith('[firstname]')) {
     // OK
 }
