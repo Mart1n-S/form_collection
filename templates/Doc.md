@@ -1,3 +1,9 @@
+if (input.name && !input.name.endsWith('[firstname]')) {
+    // OK
+}
+
+
+
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\FormInterface;
 
