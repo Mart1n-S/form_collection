@@ -314,3 +314,55 @@ section.querySelectorAll('input').forEach(input => {
         input.dispatchEvent(new Event('change', { bubbles: true }));
     }
 });
+
+
+function getDateValueForInput(input) {
+    const pattern = input.getAttribute('pattern') || '';
+    const maxLength = input.maxLength;
+
+    // Pattern explicite
+    if (pattern.includes('\\d{2}/\\d{2}/\\d{4}')) {
+        return '01/01/2000';
+    }
+
+    if (pattern.includes('\\d{2}/\\d{4}')) {
+        return '01/2000';
+    }
+
+    // Fallback par longueur
+    if (maxLength === 7) {      // MM/YYYY
+        return '01/2000';
+    }
+
+    if (maxLength === 10) {     // DD/MM/YYYY
+        return '01/01/2000';
+    }
+
+    // Fallback safe
+    return '01/01/2000';
+}
+
+
+// 👉 TEXT (y compris number masqué et date)
+if (input.type === 'text') {
+
+    // 🔥 DATE
+    if (input.dataset.type === 'date') {
+        value = getDateValueForInput(input);
+    }
+
+    // 💰 CURRENCY
+    else if (input.classList.contains('currency')) {
+        value = 1000;
+    }
+
+    // 🔢 TEXT avec maxlength
+    else if (input.maxLength > 0) {
+        value = '1'.repeat(Math.min(3, input.maxLength));
+    }
+
+    // 📝 TEXTE CLASSIQUE
+    else {
+        value = 'Test';
+    }
+}
