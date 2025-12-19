@@ -256,3 +256,61 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+
+
+
+
+
+section.querySelectorAll('input').forEach(input => {
+    if (input.disabled || input.readOnly) return;
+
+    // 👉 RADIO
+    if (input.type === 'radio') {
+        if (!document.querySelector(`input[name="${input.name}"]:checked`)) {
+            input.checked = true;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        return;
+    }
+
+    // 👉 CHECKBOX
+    if (input.type === 'checkbox') {
+        input.checked = true;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        return;
+    }
+
+    // ⛔ maintenant seulement on ignore les champs déjà remplis
+    if (input.value) return;
+
+    let value = '';
+
+    // 👉 TEXT (potentiellement numérique masqué)
+    if (input.type === 'text') {
+        if (input.classList.contains('currency')) {
+            value = 1000;
+        } else if (input.maxLength > 0) {
+            value = '1'.repeat(Math.min(3, input.maxLength));
+        } else {
+            value = 'Test';
+        }
+    }
+
+    // 👉 EMAIL
+    if (input.type === 'email') {
+        value = 'test@example.com';
+    }
+
+    // 👉 NUMBER
+    if (input.type === 'number') {
+        const min = input.min !== '' ? Number(input.min) : 0;
+        value = min;
+    }
+
+    if (value !== '') {
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+});
