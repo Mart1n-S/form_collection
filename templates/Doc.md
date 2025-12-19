@@ -157,3 +157,102 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const button = document.createElement('button');
+    button.textContent = '🧪 Auto-fill (dev)';
+    button.style.position = 'fixed';
+    button.style.bottom = '20px';
+    button.style.right = '20px';
+    button.style.zIndex = '9999';
+    button.style.padding = '10px 15px';
+
+    document.body.appendChild(button);
+
+    button.addEventListener('click', function () {
+
+        const visibleSections = Array.from(document.querySelectorAll('section'))
+            .filter(section => section.offsetParent !== null);
+
+        visibleSections.forEach(section => {
+
+            section.querySelectorAll('input').forEach(input => {
+                if (input.disabled || input.readOnly) return;
+                if (input.value) return;
+
+                let value = '';
+
+                // 👉 TEXT (mais potentiellement number masqué)
+                if (input.type === 'text') {
+
+                    if (input.classList.contains('currency')) {
+                        value = 1000;
+                    } else if (input.maxLength > 0) {
+                        value = '1'.repeat(Math.min(3, input.maxLength));
+                    } else {
+                        value = 'Test';
+                    }
+                }
+
+                // 👉 EMAIL
+                if (input.type === 'email') {
+                    value = 'test@example.com';
+                }
+
+                // 👉 NUMBER
+                if (input.type === 'number') {
+                    const min = input.min !== '' ? Number(input.min) : 0;
+                    value = min;
+                }
+
+                // 👉 RADIO
+                if (input.type === 'radio') {
+                    if (!document.querySelector(`input[name="${input.name}"]:checked`)) {
+                        input.checked = true;
+                    }
+                    return;
+                }
+
+                // 👉 CHECKBOX
+                if (input.type === 'checkbox') {
+                    input.checked = true;
+                    return;
+                }
+
+                if (value !== '') {
+                    input.value = value;
+
+                    // 🔥 Important pour les masks
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+
+            // 👉 SELECT
+            section.querySelectorAll('select').forEach(select => {
+                if (select.disabled) return;
+
+                if (select.selectedIndex === 0 && select.options.length > 1) {
+                    select.selectedIndex = 1;
+                }
+
+                select.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+
+            // 👉 TEXTAREA
+            section.querySelectorAll('textarea').forEach(textarea => {
+                if (!textarea.disabled && !textarea.value) {
+                    textarea.value = 'Test';
+                    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    textarea.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            });
+        });
+
+        console.log('✅ Auto-fill terminé');
+    });
+});
+</script>
